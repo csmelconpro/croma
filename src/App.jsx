@@ -79,39 +79,50 @@ function CromaIcon({ size = 46 }) {
 
 function LaLigaIcon({ size = 46 }) {
   const cx = size/2, cy = size/2;
-  const r = size * 0.28;
+  const r = size * 0.32;
+  const w = "rgba(255,255,255,0.95)";
+  const b = "rgba(255,255,255,0.15)";
+  // Classic soccer ball flat geometry scaled to r
+  // Pentagon top-center + 5 hexagons around + patches at edges
+  const p = (angle, dist) => [
+    cx + dist * Math.cos((angle - 90) * Math.PI / 180),
+    cy + dist * Math.sin((angle - 90) * Math.PI / 180)
+  ];
+  const pt = (pts) => pts.map(([x,y])=>`${x},${y}`).join(' ');
+
+  // Central pentagon
+  const penta = [0,72,144,216,288].map(a => p(a, r*0.38));
+
+  // 5 hexagons around the pentagon
+  const hexCenters = [0,72,144,216,288].map(a => p(a, r*0.72));
+
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{flexShrink:0}}>
       <defs>
-        <radialGradient id="llBg" cx="35%" cy="30%" r="70%">
+        <linearGradient id="llGrad" x1="0" y1="0" x2={size} y2={size} gradientUnits="userSpaceOnUse">
           <stop offset="0%" stopColor="#fbbf24"/>
-          <stop offset="45%" stopColor="#f97316"/>
+          <stop offset="50%" stopColor="#f97316"/>
           <stop offset="100%" stopColor="#dc2626"/>
-        </radialGradient>
-        <radialGradient id="llBall" cx="40%" cy="35%" r="65%">
-          <stop offset="0%" stopColor="#ffffff"/>
-          <stop offset="100%" stopColor="#e5e7eb"/>
-        </radialGradient>
+        </linearGradient>
       </defs>
-      {/* Fondo degradado */}
-      <rect width={size} height={size} rx={size*0.22} fill="url(#llBg)"/>
-      {/* Sombra del balón */}
-      <circle cx={cx+size*0.025} cy={cy+size*0.025} r={r} fill="rgba(0,0,0,0.2)"/>
-      {/* Balón blanco */}
-      <circle cx={cx} cy={cy} r={r} fill="url(#llBall)"/>
-      {/* Pentagono negro central */}
-      <polygon
-        points={`${cx},${cy-r*0.38} ${cx+r*0.36},${cy-r*0.12} ${cx+r*0.22},${cy+r*0.32} ${cx-r*0.22},${cy+r*0.32} ${cx-r*0.36},${cy-r*0.12}`}
-        fill="#111" opacity="0.75"/>
-      {/* Líneas de costura */}
-      <line x1={cx} y1={cy-r} x2={cx} y2={cy-r*0.38} stroke="#333" strokeWidth={size*0.022} opacity="0.5"/>
-      <line x1={cx} y1={cy+r*0.32} x2={cx} y2={cy+r} stroke="#333" strokeWidth={size*0.022} opacity="0.5"/>
-      <line x1={cx-r} y1={cy} x2={cx-r*0.36} y2={cy-r*0.12} stroke="#333" strokeWidth={size*0.022} opacity="0.5"/>
-      <line x1={cx+r*0.36} y1={cy-r*0.12} x2={cx+r} y2={cy} stroke="#333" strokeWidth={size*0.022} opacity="0.5"/>
-      <line x1={cx-r*0.22} y1={cy+r*0.32} x2={cx-r*0.6} y2={cy+r*0.8} stroke="#333" strokeWidth={size*0.022} opacity="0.5"/>
-      <line x1={cx+r*0.22} y1={cy+r*0.32} x2={cx+r*0.6} y2={cy+r*0.8} stroke="#333" strokeWidth={size*0.022} opacity="0.5"/>
-      {/* Brillo */}
-      <circle cx={cx-r*0.25} cy={cy-r*0.3} r={r*0.2} fill="rgba(255,255,255,0.5)"/>
+      {/* Background */}
+      <rect width={size} height={size} rx={size*0.22} fill="url(#llGrad)"/>
+      {/* Ball circle */}
+      <circle cx={cx} cy={cy} r={r} fill={w}/>
+      {/* Central pentagon — white with dark border to show shape */}
+      <polygon points={pt(penta)} fill="rgba(30,30,30,0.85)"/>
+      {/* 5 dark patches (pentagons at edges — simplified as small polygons) */}
+      {[0,72,144,216,288].map((angle, i) => {
+        const [hx, hy] = p(angle, r*0.78);
+        const hr = r * 0.22;
+        const pts = [0,60,120,180,240,300].map(a => [
+          hx + hr * Math.cos((a + angle) * Math.PI/180),
+          hy + hr * Math.sin((a + angle) * Math.PI/180)
+        ]);
+        return <polygon key={i} points={pt(pts)} fill="rgba(30,30,30,0.85)"/>;
+      })}
+      {/* Ball outline */}
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth={size*0.015}/>
     </svg>
   );
 }
