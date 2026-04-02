@@ -79,30 +79,39 @@ function CromaIcon({ size = 46 }) {
 
 function LaLigaIcon({ size = 46 }) {
   const cx = size/2, cy = size/2;
-  const ballR = size * 0.22;
+  const r = size * 0.28;
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{flexShrink:0}}>
       <defs>
-        <linearGradient id="llGrad" x1="0" y1="0" x2={size} y2={size} gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#dc2626"/>
-          <stop offset="100%" stopColor="#f97316"/>
-        </linearGradient>
+        <radialGradient id="llBg" cx="35%" cy="30%" r="70%">
+          <stop offset="0%" stopColor="#fbbf24"/>
+          <stop offset="45%" stopColor="#f97316"/>
+          <stop offset="100%" stopColor="#dc2626"/>
+        </radialGradient>
+        <radialGradient id="llBall" cx="40%" cy="35%" r="65%">
+          <stop offset="0%" stopColor="#ffffff"/>
+          <stop offset="100%" stopColor="#e5e7eb"/>
+        </radialGradient>
       </defs>
-      <rect width={size} height={size} rx={size*0.22} fill="url(#llGrad)"/>
-      {/* Ball outline */}
-      <circle cx={cx} cy={cy} r={ballR} fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth={size*0.045}/>
-      {/* Pentagon center */}
+      {/* Fondo degradado */}
+      <rect width={size} height={size} rx={size*0.22} fill="url(#llBg)"/>
+      {/* Sombra del balón */}
+      <circle cx={cx+size*0.025} cy={cy+size*0.025} r={r} fill="rgba(0,0,0,0.2)"/>
+      {/* Balón blanco */}
+      <circle cx={cx} cy={cy} r={r} fill="url(#llBall)"/>
+      {/* Pentagono negro central */}
       <polygon
-        points={`${cx},${cy-ballR*0.42} ${cx+ballR*0.4},${cy-ballR*0.13} ${cx+ballR*0.25},${cy+ballR*0.34} ${cx-ballR*0.25},${cy+ballR*0.34} ${cx-ballR*0.4},${cy-ballR*0.13}`}
-        fill="rgba(255,255,255,0.85)"/>
-      {/* Patch lines */}
-      {[[-90,-30],[30,90],[150,210],[270,330]].map(([a,b],i)=>{
-        const toRad = d => d*Math.PI/180;
-        return <line key={i}
-          x1={cx+ballR*0.42*Math.cos(toRad(a))} y1={cy+ballR*0.42*Math.sin(toRad(a))}
-          x2={cx+ballR*Math.cos(toRad(b))} y2={cy+ballR*Math.sin(toRad(b))}
-          stroke="rgba(255,255,255,0.5)" strokeWidth={size*0.025}/>;
-      })}
+        points={`${cx},${cy-r*0.38} ${cx+r*0.36},${cy-r*0.12} ${cx+r*0.22},${cy+r*0.32} ${cx-r*0.22},${cy+r*0.32} ${cx-r*0.36},${cy-r*0.12}`}
+        fill="#111" opacity="0.75"/>
+      {/* Líneas de costura */}
+      <line x1={cx} y1={cy-r} x2={cx} y2={cy-r*0.38} stroke="#333" strokeWidth={size*0.022} opacity="0.5"/>
+      <line x1={cx} y1={cy+r*0.32} x2={cx} y2={cy+r} stroke="#333" strokeWidth={size*0.022} opacity="0.5"/>
+      <line x1={cx-r} y1={cy} x2={cx-r*0.36} y2={cy-r*0.12} stroke="#333" strokeWidth={size*0.022} opacity="0.5"/>
+      <line x1={cx+r*0.36} y1={cy-r*0.12} x2={cx+r} y2={cy} stroke="#333" strokeWidth={size*0.022} opacity="0.5"/>
+      <line x1={cx-r*0.22} y1={cy+r*0.32} x2={cx-r*0.6} y2={cy+r*0.8} stroke="#333" strokeWidth={size*0.022} opacity="0.5"/>
+      <line x1={cx+r*0.22} y1={cy+r*0.32} x2={cx+r*0.6} y2={cy+r*0.8} stroke="#333" strokeWidth={size*0.022} opacity="0.5"/>
+      {/* Brillo */}
+      <circle cx={cx-r*0.25} cy={cy-r*0.3} r={r*0.2} fill="rgba(255,255,255,0.5)"/>
     </svg>
   );
 }
