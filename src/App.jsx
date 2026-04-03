@@ -232,6 +232,23 @@ const COLLECTIONS = {
   mundial: { id:"mundial", name:"Mundial 2026",     color:"#4ade80", sub:"Trading Cards", cards: MUNDIAL_CARDS, pricePerPack: 1.0, cardsPerPack: 6 },
 };
 
+
+// ─── CONTINENT GROUPS ────────────────────────────────────────────────────────
+const SELECCIONES_BY_CONTINENT = {
+  "Europa": ["Alemania","Austria","Bélgica","Croacia","Escocia","España","Francia","Inglaterra","Irán","Japón","Noruega","Países Bajos","Portugal","Suiza","Túnez"],
+  "América": ["Argentina","Brasil","Canadá","Colombia","Ecuador","Estados Unidos","Haití","México","Nueva Zelanda","Panamá","Paraguay","Uruguay"],
+  "África": ["Argelia","Cabo Verde","Costa de Marfil","Egipto","Ghana","Marruecos","Senegal","Sudáfrica","Túnez"],
+  "Asia": ["Arabia Saudí","Australia","Catar","Corea del Sur","Irán","Japón","Jordania","Uzbekistán"],
+  "Otros": ["Curazao"],
+};
+
+const LALIGA_TEAMS = [
+  "Deportivo Alavés","Athletic Club","Atlético de Madrid","FC Barcelona","Real Betis",
+  "RC Celta","Elche CF","RCD Espanyol","Getafe CF","Girona FC","Levante UD","Real Madrid",
+  "RCD Mallorca","CA Osasuna","Real Oviedo","Rayo Vallecano","Real Sociedad","Sevilla FC",
+  "Valencia CF","Villarreal CF",
+];
+
 const SECTIONS_BY_COLL = {
   laliga:  ["Todas","Regulares","Especiales","Plus","Bis","Edición Limitada"],
   mundial: ["Todas","Selecciones","Golden Baller","Categorías Especiales","Especiales Únicas","Edición Limitada"],
@@ -274,8 +291,115 @@ function SectionLabel({ children, T }) {
   return <div style={{fontSize:13,letterSpacing:2,color:T.textDim,textTransform:"uppercase",marginBottom:12,fontWeight:700}}>{children}</div>;
 }
 
+// ─── TEAMS SECTION ───────────────────────────────────────────────────────────
+function TeamsSection({ allOwned, onTeamClick, T }) {
+  const [expanded, setExpanded] = useState(null); // 'selecciones' | 'equipos'
+  const [expandedContinent, setExpandedContinent] = useState(null);
+
+  const laligaOwned = allOwned.laliga||{};
+  const mundialOwned = allOwned.mundial||{};
+
+  const getTeamPct = (team, collId) => {
+    const coll = COLLECTIONS[collId];
+    const om = collId==="laliga" ? laligaOwned : mundialOwned;
+    const cards = coll.cards.filter(c=>c.team===team);
+    if (!cards.length) return 0;
+    const owned = cards.filter(c=>om[c.id]!==undefined?om[c.id]:c.owned).length;
+    return Math.round(owned/cards.length*100);
+  };
+
+  const TeamRow = ({team, collId}) => {
+    const pct = getTeamPct(team, collId);
+    const pctColor = pct===100?T.green:pct>=70?T.gold:T.accent;
+    return (
+      <div onClick={()=>onTeamClick(team, collId)}
+        style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",
+          borderBottom:`1px solid ${T.border}`,cursor:"pointer"}}>
+        <Shield team={team} size={28}/>
+        <div style={{flex:1,minWidth:0}}>
+          <div style={{fontSize:13,fontWeight:700,color:T.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{team}</div>
+          <div style={{height:2,background:T.surface2,borderRadius:4,marginTop:4,overflow:"hidden"}}>
+            <div style={{height:"100%",width:`${pct}%`,background:pctColor,borderRadius:4}}/>
+          </div>
+        </div>
+        <div style={{fontSize:12,fontWeight:800,color:pctColor,minWidth:36,textAlign:"right"}}>{pct}%</div>
+        <div style={{color:T.textDim,fontSize:12}}>›</div>
+      </div>
+    );
+  };
+
+  const ContinentGroup = ({name, teams, collId}) => {
+    const isOpen = expandedContinent===`${collId}_${name}`;
+    return (
+      <div>
+        <div onClick={()=>setExpandedContinent(isOpen?null:`${collId}_${name}`)}
+          style={{display:"flex",alignItems:"center",justifyContent:"space-between",
+            padding:"9px 14px",background:T.surface2,cursor:"pointer",borderBottom:`1px solid ${T.border}`}}>
+          <div style={{fontSize:11,fontWeight:700,color:T.textDim,letterSpacing:1,textTransform:"uppercase"}}>{name}</div>
+          <div style={{display:"flex",alignItems:"center",gap:8}}>
+            <div style={{fontSize:10,color:T.textDim}}>{teams.length} equipos</div>
+            <div style={{color:T.textDim,fontSize:12,transform:isOpen?"rotate(90deg)":"rotate(0deg)",transition:"transform 0.2s"}}>›</div>
+          </div>
+        </div>
+        {isOpen && teams.map(team=><TeamRow key={team} team={team} collId={collId}/>)}
+      </div>
+    );
+  };
+
+  return (
+    <div style={{marginBottom:24}}>
+      <div style={{fontSize:13,letterSpacing:2,color:T.textDim,textTransform:"uppercase",marginBottom:12,fontWeight:700}}>Equipos & Selecciones</div>
+
+      {/* SELECCIONES block */}
+      <div style={{background:T.surface,border:`1px solid ${T.border}`,borderRadius:12,overflow:"hidden",marginBottom:10}}>
+        <div onClick={()=>setExpanded(expanded==="selecciones"?null:"selecciones")}
+          style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 16px",cursor:"pointer"}}>
+          <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <MundialIcon size={32}/>
+            <div>
+              <div style={{fontWeight:800,fontSize:14,color:T.text}}>Selecciones</div>
+              <div style={{fontSize:10,color:T.textDim}}>Mundial 2026 · Trading Cards</div>
+            </div>
+          </div>
+          <div style={{color:T.textDim,fontSize:18,transform:expanded==="selecciones"?"rotate(90deg)":"rotate(0deg)",transition:"transform 0.2s"}}>›</div>
+        </div>
+        {expanded==="selecciones" && (
+          <div>
+            {Object.entries(SELECCIONES_BY_CONTINENT).map(([continent, teams])=>{
+              // Only show teams that exist in mundial cards
+              const validTeams = teams.filter(t => COLLECTIONS.mundial.cards.some(c=>c.team===t));
+              if (!validTeams.length) return null;
+              return <ContinentGroup key={continent} name={continent} teams={validTeams} collId="mundial"/>;
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* EQUIPOS La Liga block */}
+      <div style={{background:T.surface,border:`1px solid ${T.border}`,borderRadius:12,overflow:"hidden"}}>
+        <div onClick={()=>setExpanded(expanded==="equipos"?null:"equipos")}
+          style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 16px",cursor:"pointer"}}>
+          <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <LaLigaIcon size={32}/>
+            <div>
+              <div style={{fontWeight:800,fontSize:14,color:T.text}}>Equipos</div>
+              <div style={{fontSize:10,color:T.textDim}}>La Liga 2025-26 · Trading Cards</div>
+            </div>
+          </div>
+          <div style={{color:T.textDim,fontSize:18,transform:expanded==="equipos"?"rotate(90deg)":"rotate(0deg)",transition:"transform 0.2s"}}>›</div>
+        </div>
+        {expanded==="equipos" && (
+          <div>
+            {LALIGA_TEAMS.map(team=><TeamRow key={team} team={team} collId="laliga"/>)}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── HOME ─────────────────────────────────────────────────────────────────────
-function HomeScreen({ allOwned, allRepeats, onEnter, onNav, T, theme, toggleTheme, showCost, toggleCost }) {
+function HomeScreen({ allOwned, allRepeats, onEnter, onNav, onTeamClick, T, theme, toggleTheme, showCost, toggleCost }) {
   const laligaCards = COLLECTIONS.laliga.cards;
   const mundialCards = COLLECTIONS.mundial.cards;
   const laligaOwned = allOwned.laliga||{};
@@ -368,6 +492,9 @@ function HomeScreen({ allOwned, allRepeats, onEnter, onNav, T, theme, toggleThem
             </div>
           );
         })}
+
+        {/* TEAMS SECTION */}
+        <TeamsSection allOwned={allOwned} onTeamClick={onTeamClick} T={T}/>
 
         {/* CASI + LEJOS en paralelo */}
         <div style={{height:1,background:T.border,marginBottom:24,marginTop:8}}/>
@@ -469,9 +596,9 @@ function HomeScreen({ allOwned, allRepeats, onEnter, onNav, T, theme, toggleThem
         {/* THEME TOGGLE - bottom right */}
         <div style={{display:"flex",justifyContent:"flex-end",marginBottom:16}}>
           <button onClick={toggleTheme}
-            style={{background:T.surface2,border:`1px solid ${T.border}`,borderRadius:20,padding:"6px 14px",
-              fontSize:12,color:T.textDim,cursor:"pointer",fontFamily:"'Inter',sans-serif"}}>
-            {theme==='dark'?'☀️ Modo claro':'🌙 Modo oscuro'}
+            style={{background:T.surface2,border:`1px solid ${T.border}`,borderRadius:"50%",width:36,height:36,
+              fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>
+            {theme==='dark'?'☀️':'🌙'}
           </button>
         </div>
       </div>
@@ -535,8 +662,14 @@ function RepeatsScreen({ allOwned, allRepeats, onBack, T }) {
   const repeatedCards = coll.cards
     .filter(c => { const owned=ownedMap[c.id]!==undefined?ownedMap[c.id]:c.owned; return owned && (repeatsMap[c.id]||0)>0; })
     .map(c => ({...c, reps: repeatsMap[c.id]||0}))
-    .sort((a,b)=>b.reps-a.reps);
+    .sort((a,b) => {
+      // Group by team first, then by card number
+      if (a.team !== b.team) return (a.team||"").localeCompare(b.team||"");
+      return parseInt(a.num) - parseInt(b.num);
+    });
   const total = repeatedCards.reduce((a,c)=>a+c.reps,0);
+  // Group by team for display
+  const grouped = repeatedCards.reduce((g,c)=>{ (g[c.team]=g[c.team]||[]).push(c); return g; },{});
 
   return (
     <div style={{minHeight:"100vh",background:T.bg,color:T.text,paddingBottom:80,fontFamily:"'Inter',sans-serif"}}>
@@ -568,14 +701,25 @@ function RepeatsScreen({ allOwned, allRepeats, onBack, T }) {
       <div style={{padding:"12px 16px"}}>
         {repeatedCards.length===0
           ? <div style={{textAlign:"center",padding:48,color:T.textDim}}><div style={{fontSize:40}}>🔄</div><div style={{fontSize:15,marginTop:8,fontWeight:600}}>Sin repetidas aquí</div></div>
-          : repeatedCards.map((card,i)=>(
-            <div key={card.id} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 0",borderBottom:`1px solid ${T.border}`}}>
-              {TEAMS[card.team] && <Shield team={card.team} size={30}/>}
-              <div style={{flex:1,minWidth:0}}>
-                <div style={{fontSize:14,fontWeight:700,color:T.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{card.name}</div>
-                <div style={{fontSize:11,color:T.textDim}}>#{card.num} · {card.team}</div>
+          : Object.entries(grouped).map(([team, cards])=>(
+            <div key={team} style={{marginBottom:8}}>
+              {/* Team header */}
+              <div style={{display:"flex",alignItems:"center",gap:10,padding:"10px 0 6px",borderBottom:`2px solid ${T.border}`}}>
+                <Shield team={team} size={28}/>
+                <div style={{fontWeight:800,fontSize:13,color:T.text}}>{team}</div>
+                <div style={{marginLeft:"auto",background:"rgba(240,192,64,0.12)",color:T.gold,fontSize:11,fontWeight:700,padding:"1px 8px",borderRadius:10}}>
+                  {cards.reduce((a,c)=>a+c.reps,0)} total
+                </div>
               </div>
-              <div style={{background:"rgba(240,192,64,0.15)",color:T.gold,fontWeight:800,fontSize:14,padding:"4px 14px",borderRadius:20}}>×{card.reps}</div>
+              {cards.map((card,i)=>(
+                <div key={card.id} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 0 10px 38px",borderBottom:`1px solid ${T.border}`}}>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontSize:14,fontWeight:600,color:T.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{card.name}</div>
+                    <div style={{fontSize:11,color:T.textDim}}>#{card.num} · {card.section}</div>
+                  </div>
+                  <div style={{background:"rgba(240,192,64,0.15)",color:T.gold,fontWeight:800,fontSize:14,padding:"4px 14px",borderRadius:20}}>×{card.reps}</div>
+                </div>
+              ))}
             </div>
           ))
         }
@@ -635,8 +779,33 @@ function PlayerCard({ card, owned, T, teamPrimary, teamSecondary }) {
   );
 }
 
+// National team colors for Mundial
+const NATIONAL = {
+  "Alemania":{"p":"#000000","s":"#ffce00"},"Arabia Saudí":{"p":"#006C35","s":"#ffffff"},
+  "Argelia":{"p":"#006233","s":"#ffffff"},"Argentina":{"p":"#74ACDF","s":"#ffffff"},
+  "Australia":{"p":"#00008B","s":"#FFD700"},"Austria":{"p":"#ED2939","s":"#ffffff"},
+  "Brasil":{"p":"#009C3B","s":"#FFDF00"},"Bélgica":{"p":"#000000","s":"#EF3340"},
+  "Cabo Verde":{"p":"#003893","s":"#ffffff"},"Canadá":{"p":"#FF0000","s":"#ffffff"},
+  "Catar":{"p":"#8D1B3D","s":"#ffffff"},"Colombia":{"p":"#FCD116","s":"#003087"},
+  "Corea del Sur":{"p":"#C60C30","s":"#003478"},"Costa de Marfil":{"p":"#F77F00","s":"#009A44"},
+  "Croacia":{"p":"#FF0000","s":"#ffffff"},"Curazao":{"p":"#002B7F","s":"#F9E814"},
+  "Ecuador":{"p":"#FFD100","s":"#003580"},"Egipto":{"p":"#CE1126","s":"#ffffff"},
+  "Escocia":{"p":"#003B6F","s":"#ffffff"},"España":{"p":"#AA151B","s":"#F1BF00"},
+  "Estados Unidos":{"p":"#002868","s":"#BF0A30"},"Francia":{"p":"#002395","s":"#ED2939"},
+  "Ghana":{"p":"#006B3F","s":"#FCD116"},"Haití":{"p":"#00209F","s":"#D21034"},
+  "Inglaterra":{"p":"#CF0034","s":"#ffffff"},"Irán":{"p":"#239F40","s":"#ffffff"},
+  "Japón":{"p":"#BC002D","s":"#ffffff"},"Jordania":{"p":"#007A3D","s":"#ffffff"},
+  "Marruecos":{"p":"#C1272D","s":"#006233"},"México":{"p":"#006847","s":"#CE1126"},
+  "Noruega":{"p":"#EF2B2D","s":"#002868"},"Nueva Zelanda":{"p":"#00247D","s":"#CC142B"},
+  "Panamá":{"p":"#DA121A","s":"#002B7F"},"Paraguay":{"p":"#D52B1E","s":"#0038A8"},
+  "Países Bajos":{"p":"#FF4F00","s":"#ffffff"},"Portugal":{"p":"#006600","s":"#FF0000"},
+  "Senegal":{"p":"#00853F","s":"#FDEF42"},"Sudáfrica":{"p":"#007A4D","s":"#FFB81C"},
+  "Suiza":{"p":"#FF0000","s":"#ffffff"},"Túnez":{"p":"#E70013","s":"#ffffff"},
+  "Uruguay":{"p":"#5EB6E4","s":"#ffffff"},"Uzbekistán":{"p":"#1EB53A","s":"#ffffff"},
+};
+
 function TeamScreen({ team, collId, ownedMap, onBack, T }) {
-  const t = TEAMS[team] || { p:"#333", s:"#666", abbr:"?" };
+  const t = TEAMS[team] || NATIONAL[team] || { p:"#1a3a6b", s:"#ffffff", abbr:"?" };
   const coll = COLLECTIONS[collId];
   const teamCards = coll.cards.filter(c => c.team === team);
   const owned = teamCards.filter(c => ownedMap[c.id]!==undefined ? ownedMap[c.id] : c.owned);
@@ -1070,6 +1239,7 @@ function NavBar({ screen, onNav, T }) {
 export default function App() {
   const [screen, setScreen] = useState("home");
   const [activeCollId, setActiveCollId] = useState(null);
+  const [activeTeamName, setActiveTeamName] = useState(null);
   const [theme, setTheme] = useState(LS.loadTheme);
   const [showCost, setShowCost] = useState(LS.loadShowCost);
   const T = THEMES[theme];
@@ -1087,6 +1257,9 @@ export default function App() {
     setAllRepeats(prev => { const cur=prev[collId]||{}; const nv=Math.max(0,(cur[cardId]||0)+delta); const u={...cur,[cardId]:nv}; LS.saveAll(collId,allOwned[collId]||{},u); return {...prev,[collId]:u}; });
   };
   const handleNav = s => { setScreen(s); setActiveCollId(null); };
+
+  if (screen==="team"&&activeCollId&&activeTeamName)
+    return <><TeamScreen team={activeTeamName} collId={activeCollId} ownedMap={allOwned[activeCollId]||{}} onBack={()=>setScreen("home")} T={T}/></>;
 
   if (screen==="collection"&&activeCollId)
     return <CollectionScreen collId={activeCollId} ownedMap={allOwned[activeCollId]||{}} repeatsMap={allRepeats[activeCollId]||{}}
