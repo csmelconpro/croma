@@ -97,10 +97,10 @@ function LaLigaIcon({ size = 46 }) {
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{flexShrink:0}}>
       <defs>
-        <linearGradient id="wg2" x1="0" y1="0" x2={size} y2={size} gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#fbbf24"/>
-          <stop offset="50%" stopColor="#f97316"/>
-          <stop offset="100%" stopColor="#dc2626"/>
+        <linearGradient id="llGrad" x1="0" y1="0" x2={size} y2={size} gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#cf9b15"/>
+          <stop offset="50%" stopColor="#e21a1a"/>
+          <stop offset="100%" stopColor="#e21818"/>
         </linearGradient>
       </defs>
       {/* Background */}
