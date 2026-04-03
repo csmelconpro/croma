@@ -85,30 +85,33 @@ function CromaLogo({ height = 48, color = "#ffffff" }) {
 
 // ─── ICONS ────────────────────────────────────────────────────────────────────
 function LaLigaIcon({ size = 46 }) {
-  const cx = size/2, cy = size/2, r = size * 0.3;
+  const cx = size/2, cy = size/2, r = size * 0.33;
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{flexShrink:0}}>
       <defs>
-        <radialGradient id="llBg" cx="40%" cy="30%" r="70%">
-          <stop offset="0%" stopColor="#fbbf24"/>
-          <stop offset="50%" stopColor="#f97316"/>
-          <stop offset="100%" stopColor="#dc2626"/>
-        </radialGradient>
-        <radialGradient id="llBall" cx="38%" cy="32%" r="60%">
-          <stop offset="0%" stopColor="#ffffff"/>
-          <stop offset="100%" stopColor="#d1d5db"/>
+        <radialGradient id="llBg" cx="50%" cy="50%" r="70%">
+          <stop offset="0%"   stopColor="#fde047"/>
+          <stop offset="30%"  stopColor="#fb923c"/>
+          <stop offset="65%"  stopColor="#ef4444"/>
+          <stop offset="100%" stopColor="#991b1b"/>
         </radialGradient>
       </defs>
       <rect width={size} height={size} rx={size*0.22} fill="url(#llBg)"/>
-      <circle cx={cx} cy={cy} r={r} fill="url(#llBall)"/>
-      <polygon points={`${cx},${cy-r*.38} ${cx+r*.36},${cy-r*.12} ${cx+r*.22},${cy+r*.32} ${cx-r*.22},${cy+r*.32} ${cx-r*.36},${cy-r*.12}`} fill="rgba(15,15,15,0.85)"/>
+      {/* Balón flat oscuro */}
+      <circle cx={cx} cy={cy} r={r} fill="#0d1117"/>
+      {/* Hexágonos blancos del balón */}
+      <polygon points={`${cx},${cy-r*.42} ${cx+r*.4},${cy-r*.13} ${cx+r*.25},${cy+r*.35} ${cx-r*.25},${cy+r*.35} ${cx-r*.4},${cy-r*.13}`}
+        fill="white" opacity="0.92"/>
       {[0,72,144,216,288].map((a,i) => {
         const rad = (a-90)*Math.PI/180;
-        const hx = cx+r*.78*Math.cos(rad), hy = cy+r*.78*Math.sin(rad), hr = r*.18;
-        const pts = [0,60,120,180,240,300].map(b => { const br=(b+a)*Math.PI/180; return `${hx+hr*Math.cos(br)},${hy+hr*Math.sin(br)}`; }).join(' ');
-        return <polygon key={i} points={pts} fill="rgba(15,15,15,0.85)"/>;
+        const hx = cx+r*.78*Math.cos(rad), hy = cy+r*.78*Math.sin(rad), hr = r*.2;
+        const pts = [0,60,120,180,240,300].map(b => {
+          const br=(b+a-30)*Math.PI/180;
+          return `${hx+hr*Math.cos(br)},${hy+hr*Math.sin(br)}`;
+        }).join(' ');
+        return <polygon key={i} points={pts} fill="white" opacity="0.92"/>;
       })}
-      <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth={size*.012}/>
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth={size*.015}/>
     </svg>
   );
 }
