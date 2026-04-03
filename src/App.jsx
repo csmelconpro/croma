@@ -695,8 +695,131 @@ function RepeatsScreen({ allOwned, allRepeats, onBack, T }) {
   );
 }
 
+// ─── TEAM SCREEN ─────────────────────────────────────────────────────────────
+function PlayerCard({ card, owned, T, teamPrimary, teamSecondary }) {
+  const positions = { "POR":"GK", "DEF":"DEF", "MED":"MID", "DEL":"FWD" };
+  const pos = positions[card.pos] || card.section?.slice(0,3).toUpperCase() || "★";
+  return (
+    <div style={{
+      background: owned
+        ? `linear-gradient(160deg, ${teamPrimary}ee, ${teamPrimary}99)`
+        : `linear-gradient(160deg, #1a1a1a, #2a2a2a)`,
+      border: `1px solid ${owned ? teamSecondary+"44" : "#333"}`,
+      borderRadius: 14,
+      padding: "16px 14px 12px",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-between",
+      minHeight: 110,
+      opacity: owned ? 1 : 0.45,
+      position: "relative",
+      overflow: "hidden",
+    }}>
+      {/* Background number watermark */}
+      <div style={{position:"absolute",right:-4,top:-8,fontSize:52,fontWeight:900,color:"rgba(255,255,255,0.06)",fontFamily:"Inter,sans-serif",lineHeight:1}}>
+        {card.num}
+      </div>
+      {/* Top row: number + owned indicator */}
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
+        <div style={{fontSize:10,fontWeight:700,color:"rgba(255,255,255,0.5)",letterSpacing:1}}>#{card.num}</div>
+        {owned
+          ? <div style={{width:8,height:8,borderRadius:"50%",background:"#22c55e"}}/>
+          : <div style={{width:8,height:8,borderRadius:"50%",background:"rgba(255,255,255,0.15)"}}/>
+        }
+      </div>
+      {/* Player name */}
+      <div style={{flex:1,display:"flex",alignItems:"center"}}>
+        <div style={{fontSize:13,fontWeight:800,color:"#ffffff",lineHeight:1.2,overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical"}}>
+          {card.name}
+        </div>
+      </div>
+      {/* Bottom: position + CROMA logo */}
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-end",marginTop:8}}>
+        <div style={{background:"rgba(255,255,255,0.15)",borderRadius:6,padding:"2px 7px",fontSize:10,fontWeight:800,color:"rgba(255,255,255,0.9)",letterSpacing:1}}>
+          {pos}
+        </div>
+        <div style={{fontSize:9,fontWeight:900,color:"rgba(255,255,255,0.35)",letterSpacing:2,fontFamily:"Inter,sans-serif"}}>
+          CROMA
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TeamScreen({ team, collId, ownedMap, onBack, T }) {
+  const t = TEAMS[team] || { p:"#333", s:"#666", abbr:"?" };
+  const coll = COLLECTIONS[collId];
+  const teamCards = coll.cards.filter(c => c.team === team);
+  const owned = teamCards.filter(c => ownedMap[c.id]!==undefined ? ownedMap[c.id] : c.owned);
+  const pct = Math.round(owned.length / teamCards.length * 100);
+
+  // Group by section
+  const sections = {};
+  teamCards.forEach(c => {
+    if (!sections[c.section]) sections[c.section] = [];
+    sections[c.section].push(c);
+  });
+
+  return (
+    <div style={{minHeight:"100vh",background:"#0a0a0a",color:"#fff",paddingBottom:40,fontFamily:"Inter,sans-serif"}}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');`}</style>
+
+      {/* Hero header with team colors */}
+      <div style={{
+        background: `linear-gradient(160deg, ${t.p} 0%, ${t.p}88 60%, #0a0a0a 100%)`,
+        padding: "56px 20px 28px",
+        position: "relative",
+        overflow: "hidden",
+      }}>
+        {/* Back button */}
+        <button onClick={onBack} style={{background:"rgba(0,0,0,0.3)",border:"none",color:"#fff",fontSize:20,cursor:"pointer",borderRadius:10,padding:"6px 12px",marginBottom:20,display:"flex",alignItems:"center",gap:6}}>
+          ← Volver
+        </button>
+
+        {/* Shield + Team name */}
+        <div style={{display:"flex",alignItems:"center",gap:20}}>
+          <Shield team={team} size={72}/>
+          <div>
+            <div style={{fontWeight:900,fontSize:26,lineHeight:1.1,color:"#fff"}}>{team}</div>
+            <div style={{fontSize:12,color:"rgba(255,255,255,0.6)",marginTop:4}}>{coll.name}</div>
+            <div style={{marginTop:8,display:"flex",alignItems:"center",gap:10}}>
+              <div style={{fontWeight:800,fontSize:22,color:pct===100?"#22c55e":pct>60?"#f0c040":"#f97316"}}>{pct}%</div>
+              <div style={{fontSize:12,color:"rgba(255,255,255,0.5)"}}>{owned.length} / {teamCards.length} cartas</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Progress bar */}
+        <div style={{height:4,background:"rgba(0,0,0,0.3)",borderRadius:4,overflow:"hidden",marginTop:20}}>
+          <div style={{height:"100%",width:`${pct}%`,background: pct===100?"#22c55e":t.s==="#ffffff"?"rgba(255,255,255,0.9)":t.s,borderRadius:4,transition:"width 0.6s"}}/>
+        </div>
+      </div>
+
+      {/* Cards by section */}
+      <div style={{padding:"20px 16px"}}>
+        {Object.entries(sections).map(([section, cards]) => (
+          <div key={section} style={{marginBottom:28}}>
+            <div style={{fontSize:10,letterSpacing:3,color:"rgba(255,255,255,0.4)",textTransform:"uppercase",fontWeight:700,marginBottom:12,paddingLeft:2}}>
+              {section}
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+              {cards.map(card => {
+                const isOwned = ownedMap[card.id]!==undefined ? ownedMap[card.id] : card.owned;
+                return (
+                  <PlayerCard key={card.id} card={card} owned={isOwned} T={T} teamPrimary={t.p} teamSecondary={t.s}/>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ─── STATS SCREEN ─────────────────────────────────────────────────────────────
 function StatsScreen({ allOwned, onBack, T }) {
+  const [activeTeam, setActiveTeam] = useState(null);
   const [activeCollId, setActiveCollId] = useState("laliga");
   const [sortBy, setSortBy] = useState("missing");
   const coll = COLLECTIONS[activeCollId];
@@ -719,6 +842,7 @@ function StatsScreen({ allOwned, onBack, T }) {
   const specList = useMemo(()=>buildList(SPEC_SECS[activeCollId]||[]),[activeCollId,ownedMap]);
 
   const renderRow = (item,i,arr,color) => {
+    const handleTeamClick = () => setActiveTeam(item.team);
     // Color gradient based on % — red < 40%, gold 40-79%, green 80%+
     const pctColor = item.pct===100 ? T.green : item.pct>=80 ? T.green : item.pct>=40 ? T.gold : T.red;
     const barGrad = item.pct===100
@@ -727,7 +851,7 @@ function StatsScreen({ allOwned, onBack, T }) {
       : item.pct>=40 ? `linear-gradient(90deg,${T.red},${T.gold})`
       : T.red;
     return (
-      <div key={item.team} style={{display:"flex",alignItems:"center",gap:12,padding:"11px 0",borderBottom:i<arr.length-1?`1px solid ${T.border}`:"none"}}>
+      <div key={item.team} onClick={handleTeamClick} style={{display:"flex",alignItems:"center",gap:12,padding:"11px 0",borderBottom:i<arr.length-1?`1px solid ${T.border}`:"none",cursor:"pointer"}}>
         <Shield team={item.team} size={32}/>
         <div style={{flex:1,minWidth:0}}>
           <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:4,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.team}</div>
@@ -742,6 +866,8 @@ function StatsScreen({ allOwned, onBack, T }) {
       </div>
     );
   };
+
+  if (activeTeam) return <TeamScreen team={activeTeam} collId={activeCollId} ownedMap={allOwned[activeCollId]||{}} onBack={()=>setActiveTeam(null)} T={T}/>;
 
   return (
     <div style={{minHeight:"100vh",background:T.bg,color:T.text,paddingBottom:80,fontFamily:"'Inter',sans-serif"}}>
