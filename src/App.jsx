@@ -398,8 +398,150 @@ function TeamsSection({ allOwned, onTeamClick, T }) {
   );
 }
 
+// ─── CROMA MASTER SECTION ────────────────────────────────────────────────────
+function CromaMasterSection({ T }) {
+  const cards = [
+    {
+      id: "blue",
+      name: "ILYAS NAREM",
+      subtitle: "EL CAOS ELEGENTE",
+      num: "018",
+      pos: "GD",
+      accent: "#3b5bdb",
+      glow: "#4c6ef5",
+      particle: "#818cf8",
+      bg: "linear-gradient(160deg, #e8eaf6 0%, #c5cae9 40%, #e3e8ff 100%)",
+      icon: "◉",
+    },
+    {
+      id: "purple",
+      name: "KAEL DRAVIK",
+      subtitle: "EL DEPREDADOR BINARIO",
+      num: "045",
+      pos: "DG",
+      accent: "#7c3aed",
+      glow: "#a855f7",
+      particle: "#f472b6",
+      bg: "linear-gradient(160deg, #fdf4ff 0%, #f3e8ff 40%, #fff1f2 100%)",
+      icon: "⊕",
+    },
+    {
+      id: "gold",
+      name: "ZAYRO KINT",
+      subtitle: "EL HORIZONTE",
+      num: "003",
+      pos: "ELI",
+      accent: "#b45309",
+      glow: "#f59e0b",
+      particle: "#fcd34d",
+      bg: "linear-gradient(160deg, #fffbeb 0%, #fef3c7 40%, #fff9e6 100%)",
+      icon: "⚡",
+    },
+  ];
+
+  return (
+    <div style={{marginBottom:28}}>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
+        <div style={{fontSize:13,letterSpacing:2,color:T.textDim,textTransform:"uppercase",fontWeight:700}}>
+          Colección CROMA Master
+        </div>
+        <div style={{background:"rgba(249,115,22,0.1)",color:T.accent,fontSize:10,fontWeight:700,
+          padding:"2px 10px",borderRadius:20,letterSpacing:1}}>PRÓXIMAMENTE</div>
+      </div>
+
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
+        {cards.map(card => (
+          <div key={card.id} style={{
+            background: card.bg,
+            borderRadius: 12,
+            padding: "12px 8px 10px",
+            position: "relative",
+            overflow: "hidden",
+            border: `1px solid ${card.accent}22`,
+            filter: "grayscale(0.15)",
+          }}>
+            {/* Locked overlay */}
+            <div style={{
+              position: "absolute", inset: 0,
+              background: "rgba(0,0,0,0.52)",
+              borderRadius: 12,
+              display: "flex", flexDirection: "column",
+              alignItems: "center", justifyContent: "center",
+              zIndex: 10,
+              backdropFilter: "blur(2px)",
+            }}>
+              <div style={{fontSize: 22, marginBottom: 4}}>🔒</div>
+              <div style={{fontSize: 9, color: "rgba(255,255,255,0.7)", fontWeight: 700, letterSpacing: 1}}>BLOQUEADA</div>
+            </div>
+
+            {/* Card content (visible behind lock) */}
+            {/* Glow effect */}
+            <div style={{
+              position: "absolute", left: "50%", top: "55%",
+              transform: "translate(-50%,-50%)",
+              width: "70%", height: "60%",
+              background: card.glow,
+              borderRadius: "50%",
+              filter: "blur(18px)",
+              opacity: 0.35,
+            }}/>
+
+            {/* Player silhouette */}
+            <div style={{
+              height: 80,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 42, marginBottom: 4,
+              position: "relative",
+              color: card.glow,
+              filter: `drop-shadow(0 0 8px ${card.glow})`,
+            }}>
+              🏃
+            </div>
+
+            {/* Name */}
+            <div style={{fontSize: 9, fontWeight: 900, color: card.accent, lineHeight: 1.1,
+              textAlign: "left", marginBottom: 1, letterSpacing: 0.5}}>
+              {card.name}
+            </div>
+            <div style={{fontSize: 7, color: card.accent, opacity: 0.7, marginBottom: 8, letterSpacing: 0.3}}>
+              {card.subtitle}
+            </div>
+
+            {/* Number + pos */}
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-end"}}>
+              <div style={{fontSize: 8, fontWeight: 800, color: card.accent}}>#{card.num}/100</div>
+              <div style={{fontSize: 9, color: card.accent}}>{card.icon}</div>
+            </div>
+
+            {/* Side pos tag */}
+            <div style={{
+              position: "absolute", right: 0, top: "35%",
+              background: card.accent,
+              color: "#fff",
+              fontSize: 7, fontWeight: 800,
+              padding: "6px 3px",
+              borderRadius: "4px 0 0 4px",
+              writingMode: "vertical-rl",
+              letterSpacing: 1,
+            }}>
+              {card.pos}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{marginTop:10,padding:"10px 14px",background:T.surface,border:`1px solid ${T.border}`,
+        borderRadius:10,textAlign:"center"}}>
+        <div style={{fontSize:12,color:T.textDim}}>
+          Las cartas <span style={{color:T.accent,fontWeight:700}}>CROMA Master</span> son una colección exclusiva de edición limitada que llegará próximamente 🚀
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── HOME ─────────────────────────────────────────────────────────────────────
-function HomeScreen({ allOwned, allRepeats, onEnter, onNav, onTeamClick, T, theme, toggleTheme, showCost, toggleCost }) {
+function HomeScreen({ allOwned, allRepeats, onEnter, onNav, T, theme, toggleTheme, showCost, toggleCost }) {
   const laligaCards = COLLECTIONS.laliga.cards;
   const mundialCards = COLLECTIONS.mundial.cards;
   const laligaOwned = allOwned.laliga||{};
@@ -493,8 +635,10 @@ function HomeScreen({ allOwned, allRepeats, onEnter, onNav, onTeamClick, T, them
           );
         })}
 
-        {/* TEAMS SECTION */}
-        <TeamsSection allOwned={allOwned} onTeamClick={onTeamClick} T={T}/>
+        {/* CROMA MASTER */}
+        <CromaMasterSection T={T}/>
+
+        <div style={{height:1,background:T.border,marginBottom:24}}/>
 
         {/* CASI + LEJOS en paralelo */}
         <div style={{height:1,background:T.border,marginBottom:24,marginTop:8}}/>
