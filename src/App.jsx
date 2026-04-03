@@ -635,11 +635,6 @@ function HomeScreen({ allOwned, allRepeats, onEnter, onNav, T, theme, toggleThem
           );
         })}
 
-        {/* CROMA MASTER */}
-        <CromaMasterSection T={T}/>
-
-        <div style={{height:1,background:T.border,marginBottom:24}}/>
-
         {/* CASI + LEJOS en paralelo */}
         <div style={{height:1,background:T.border,marginBottom:24,marginTop:8}}/>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:24}}>
@@ -725,6 +720,9 @@ function HomeScreen({ allOwned, allRepeats, onEnter, onNav, T, theme, toggleThem
             </div>
           </div>
         </div>
+
+        {/* CROMA MASTER */}
+        <CromaMasterSection T={T}/>
 
         {/* COST TOGGLE */}
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 16px",background:T.surface,border:`1px solid ${T.border}`,borderRadius:12,marginBottom:24}}>
