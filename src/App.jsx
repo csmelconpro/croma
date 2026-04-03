@@ -85,36 +85,34 @@ function CromaLogo({ height = 48, color = "#ffffff" }) {
 
 // ─── ICONS ────────────────────────────────────────────────────────────────────
 function LaLigaIcon({ size = 46 }) {
-  const cx = size/2, cy = size/2, r = size * 0.33;
+  const s = size;
+  const body    = `M${s*.32},${s*.68} L${s*.68},${s*.68} L${s*.63},${s*.5} Q${s*.72},${s*.36} ${s*.7},${s*.2} Q${s*.5},${s*.14} ${s*.3},${s*.2} Q${s*.28},${s*.36} ${s*.37},${s*.5} Z`;
+  const handles = `M${s*.32},${s*.28} Q${s*.16},${s*.28} ${s*.16},${s*.42} Q${s*.16},${s*.54} ${s*.32},${s*.52} M${s*.68},${s*.28} Q${s*.84},${s*.28} ${s*.84},${s*.42} Q${s*.84},${s*.54} ${s*.68},${s*.52}`;
+  const base1   = `M${s*.28},${s*.73} L${s*.72},${s*.73} L${s*.69},${s*.79} L${s*.31},${s*.79} Z`;
+  const base2   = `M${s*.22},${s*.79} L${s*.78},${s*.79} L${s*.78},${s*.86} L${s*.22},${s*.86} Z`;
   return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{flexShrink:0}}>
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} fill="none">
       <defs>
-        <radialGradient id="llBg" cx="50%" cy="50%" r="70%">
-          <stop offset="0%"   stopColor="#fde047"/>
-          <stop offset="30%"  stopColor="#fb923c"/>
-          <stop offset="65%"  stopColor="#ef4444"/>
-          <stop offset="100%" stopColor="#991b1b"/>
+        <radialGradient id="llBg2" cx="35%" cy="25%" r="75%">
+          <stop offset="0%" stopColor="#facc15"/>
+          <stop offset="35%" stopColor="#f97316"/>
+          <stop offset="70%" stopColor="#ea580c"/>
+          <stop offset="100%" stopColor="#dc2626"/>
         </radialGradient>
       </defs>
-      <rect width={size} height={size} rx={size*0.22} fill="url(#llBg)"/>
-      {/* Balón flat oscuro */}
-      <circle cx={cx} cy={cy} r={r} fill="#0d1117"/>
-      {/* Hexágonos blancos del balón */}
-      <polygon points={`${cx},${cy-r*.42} ${cx+r*.4},${cy-r*.13} ${cx+r*.25},${cy+r*.35} ${cx-r*.25},${cy+r*.35} ${cx-r*.4},${cy-r*.13}`}
-        fill="white" opacity="0.92"/>
-      {[0,72,144,216,288].map((a,i) => {
-        const rad = (a-90)*Math.PI/180;
-        const hx = cx+r*.78*Math.cos(rad), hy = cy+r*.78*Math.sin(rad), hr = r*.2;
-        const pts = [0,60,120,180,240,300].map(b => {
-          const br=(b+a-30)*Math.PI/180;
-          return `${hx+hr*Math.cos(br)},${hy+hr*Math.sin(br)}`;
-        }).join(' ');
-        return <polygon key={i} points={pts} fill="white" opacity="0.92"/>;
-      })}
-      <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth={size*.015}/>
+      <rect width={size} height={size} rx={size*0.22} fill="url(#llBg2)"/>
+      <path d={body}    fill="rgba(255,255,255,0.92)"/>
+      <path d={handles} stroke="rgba(255,255,255,0.88)" strokeWidth={s*.045} fill="none" strokeLinecap="round"/>
+      <path d={base1}   fill="rgba(255,255,255,0.92)"/>
+      <path d={base2}   fill="rgba(255,255,255,0.85)"/>
+      <line x1={s*.44} y1={s*.68} x2={s*.44} y2={s*.73} stroke="rgba(255,255,255,0.7)" strokeWidth={s*.04}/>
+      <line x1={s*.56} y1={s*.68} x2={s*.56} y2={s*.73} stroke="rgba(255,255,255,0.7)" strokeWidth={s*.04}/>
+      <polygon points={`${s*.5},${s*.07} ${s*.52},${s*.12} ${s*.57},${s*.12} ${s*.53},${s*.15} ${s*.55},${s*.2} ${s*.5},${s*.17} ${s*.45},${s*.2} ${s*.47},${s*.15} ${s*.43},${s*.12} ${s*.48},${s*.12}`}
+        fill="rgba(255,220,50,0.95)"/>
     </svg>
   );
 }
+
 
 function MundialIcon({ size = 46 }) {
   const s = size;
@@ -463,19 +461,27 @@ function RepeatsScreen({ allOwned, allRepeats, onBack, T }) {
     <div style={{minHeight:"100vh",background:T.bg,color:T.text,paddingBottom:80,fontFamily:"'Inter',sans-serif"}}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');`}</style>
       <div style={{padding:"56px 16px 16px",borderBottom:`1px solid ${T.border}`}}>
-        <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:16}}>
+        <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:20}}>
           <button onClick={onBack} style={{background:"none",border:"none",color:T.text,fontSize:22,cursor:"pointer"}}>←</button>
           <div style={{flex:1,fontWeight:800,fontSize:22,color:T.text}}>Mis repetidas 🔄</div>
           {total>0 && <div style={{background:"rgba(240,192,64,0.12)",color:T.gold,fontWeight:700,fontSize:12,padding:"3px 12px",borderRadius:20}}>{total} total</div>}
         </div>
-        <div style={{display:"flex",gap:8}}>
-          {Object.values(COLLECTIONS).map(c=>(
-            <button key={c.id} onClick={()=>setActiveCollId(c.id)}
-              style={{padding:"6px 16px",borderRadius:20,fontSize:12,fontWeight:700,cursor:"pointer",border:"none",fontFamily:"'Inter',sans-serif",
-                background:activeCollId===c.id?c.color:T.surface2, color:activeCollId===c.id?"#fff":T.textDim}}>
-              {c.name}
-            </button>
-          ))}
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+          {Object.values(COLLECTIONS).map(c=>{
+            const isActive = activeCollId===c.id;
+            const collRepeats = Object.values(allRepeats[c.id]||{}).reduce((a,b)=>a+b,0);
+            return (
+              <div key={c.id} onClick={()=>setActiveCollId(c.id)}
+                style={{background:T.surface,border:`2px solid ${isActive?c.color:T.border}`,borderRadius:16,padding:16,cursor:"pointer",textAlign:"center",transition:"border-color 0.2s"}}>
+                <div style={{display:"flex",justifyContent:"center",marginBottom:10}}>
+                  {c.id==="laliga" ? <LaLigaIcon size={64}/> : <MundialIcon size={64}/>}
+                </div>
+                <div style={{fontWeight:800,fontSize:15,color:T.text,marginBottom:2}}>{c.name}</div>
+                <div style={{fontSize:11,color:T.textDim}}>{c.sub}</div>
+                {collRepeats>0 && <div style={{marginTop:6,background:"rgba(240,192,64,0.12)",color:T.gold,fontWeight:700,fontSize:11,padding:"2px 10px",borderRadius:12,display:"inline-block"}}>{collRepeats} repetidas</div>}
+              </div>
+            );
+          })}
         </div>
       </div>
       <div style={{padding:"12px 16px"}}>
@@ -544,14 +550,22 @@ function StatsScreen({ allOwned, onBack, T }) {
           <button onClick={onBack} style={{background:"none",border:"none",color:T.text,fontSize:22,cursor:"pointer"}}>←</button>
           <div style={{flex:1,fontWeight:800,fontSize:22,color:T.text}}>Estadísticas 📊</div>
         </div>
-        <div style={{display:"flex",gap:8,marginBottom:12}}>
-          {Object.values(COLLECTIONS).map(c=>(
-            <button key={c.id} onClick={()=>setActiveCollId(c.id)}
-              style={{padding:"6px 16px",borderRadius:20,fontSize:12,fontWeight:700,cursor:"pointer",border:"none",fontFamily:"'Inter',sans-serif",
-                background:activeCollId===c.id?c.color:T.surface2,color:activeCollId===c.id?"#fff":T.textDim}}>
-              {c.name}
-            </button>
-          ))}
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:12}}>
+          {Object.values(COLLECTIONS).map(c=>{
+            const isActive = activeCollId===c.id;
+            const om = allOwned[c.id]||{};
+            const pct = Math.round(c.cards.filter(card=>om[card.id]!==undefined?om[card.id]:card.owned).length/c.cards.length*100);
+            return (
+              <div key={c.id} onClick={()=>setActiveCollId(c.id)}
+                style={{background:T.surface,border:`2px solid ${isActive?c.color:T.border}`,borderRadius:14,padding:12,cursor:"pointer",textAlign:"center",transition:"border-color 0.2s"}}>
+                <div style={{display:"flex",justifyContent:"center",marginBottom:8}}>
+                  {c.id==="laliga" ? <LaLigaIcon size={52}/> : <MundialIcon size={52}/>}
+                </div>
+                <div style={{fontWeight:800,fontSize:13,color:T.text}}>{c.name}</div>
+                <div style={{fontSize:11,color:c.color,fontWeight:700,marginTop:2}}>{pct}%</div>
+              </div>
+            );
+          })}
         </div>
         <div style={{display:"flex",gap:8}}>
           {[["missing","Más faltan"],["owned","Más completos"],["name","A-Z"]].map(([v,l])=>(
