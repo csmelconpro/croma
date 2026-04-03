@@ -1201,6 +1201,13 @@ function CollectionScreen({ collId, ownedMap, repeatsMap, onToggle, onRepeat, on
   const [activeTeam, setActiveTeam] = useState("Todos");
   const [filter, setFilter] = useState("todas");
   const [search, setSearch] = useState("");
+  const [viewMode, setViewMode] = useState(() => {
+    try { return localStorage.getItem(`croma_view_${collId}`) || 'list'; } catch { return 'list'; }
+  });
+  const setView = (mode) => {
+    setViewMode(mode);
+    try { localStorage.setItem(`croma_view_${collId}`, mode); } catch {}
+  };
 
   const cards = coll.cards.map(c=>({...c, owned: ownedMap[c.id]!==undefined?ownedMap[c.id]:c.owned}));
   const totalOwned = cards.filter(c=>c.owned).length;
@@ -1256,6 +1263,16 @@ function CollectionScreen({ collId, ownedMap, repeatsMap, onToggle, onRepeat, on
             <div style={{fontWeight:900,fontSize:26,color:coll.color}}>{pct}%</div>
             <div style={{fontSize:10,color:T.textDim}}>{totalOwned}/{cards.length}</div>
           </div>
+          <div style={{display:"flex",gap:4,marginLeft:8}}>
+            <button onClick={()=>setView('list')}
+              style={{width:32,height:32,borderRadius:8,border:`1px solid ${viewMode==='list'?coll.color:T.border}`,
+                background:viewMode==='list'?coll.color+'22':T.surface2,cursor:"pointer",
+                display:"flex",alignItems:"center",justifyContent:"center",fontSize:14}}>☰</button>
+            <button onClick={()=>setView('cards')}
+              style={{width:32,height:32,borderRadius:8,border:`1px solid ${viewMode==='cards'?coll.color:T.border}`,
+                background:viewMode==='cards'?coll.color+'22':T.surface2,cursor:"pointer",
+                display:"flex",alignItems:"center",justifyContent:"center",fontSize:14}}>⊞</button>
+          </div>
         </div>
         <div style={{height:3,background:T.surface2,borderRadius:4,overflow:"hidden"}}>
           <div style={{height:"100%",width:`${pct}%`,background:coll.color,borderRadius:4,transition:"width 0.5s"}}/>
@@ -1300,49 +1317,100 @@ function CollectionScreen({ collId, ownedMap, repeatsMap, onToggle, onRepeat, on
         {Object.entries(grouped).map(([team,teamCards])=>{
           const ownedN=teamCards.filter(c=>c.owned).length;
           const tPct=Math.round(ownedN/teamCards.length*100);
-          const accent=TEAMS[team]?.p||coll.color;
+          const accent=(TEAMS[team]?.p)||(NATIONAL[team]?.p)||coll.color;
           return (
             <div key={team} style={{marginBottom:16}}>
-              <div style={{display:"flex",alignItems:"center",gap:10,padding:"8px 12px",background:T.surface,borderRadius:"10px 10px 0 0",borderLeft:`3px solid ${accent}`}}>
-                {TEAMS[team] && <Shield team={team} size={28}/>}
+              {/* Team header */}
+              <div style={{display:"flex",alignItems:"center",gap:10,padding:"8px 12px",background:T.surface,borderRadius:viewMode==='list'?"10px 10px 0 0":10,borderLeft:`3px solid ${accent}`,marginBottom:viewMode==='cards'?8:0}}>
+                {(TEAMS[team]||NATIONAL[team]) && <Shield team={team} size={28}/>}
                 <div style={{fontWeight:800,fontSize:14,flex:1,color:T.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{team}</div>
                 <div style={{height:3,width:44,background:T.surface2,borderRadius:4,overflow:"hidden"}}>
                   <div style={{height:"100%",width:`${tPct}%`,background:accent,borderRadius:4}}/>
                 </div>
                 <span style={{fontSize:11,color:T.textDim,flexShrink:0}}>{ownedN}/{teamCards.length}</span>
               </div>
-              <div style={{background:T.surface2,borderRadius:"0 0 10px 10px",overflow:"hidden"}}>
-                {teamCards.map((card,i)=>{
-                  const reps=repeatsMap[card.id]||0;
-                  return (
-                    <div key={card.id} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",
-                        background:card.owned?"rgba(34,197,94,0.04)":"transparent",
-                        borderBottom:i<teamCards.length-1?`1px solid ${T.border}`:"none"}}>
-                      <div onClick={()=>onToggle(collId,card.id,!card.owned)}
-                        style={{width:22,height:22,borderRadius:5,border:`2px solid ${card.owned?T.green:T.border}`,
-                          background:card.owned?T.green:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,cursor:"pointer",transition:"all 0.15s"}}>
-                        {card.owned&&<span style={{fontSize:12,color:"#000",fontWeight:900}}>✓</span>}
-                      </div>
-                      <div style={{flex:1,minWidth:0}}>
-                        <div style={{fontSize:14,fontWeight:600,color:card.owned?T.text:T.textDim,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{card.name}</div>
-                        <div style={{fontSize:10,color:T.textDim,marginTop:1}}>#{card.num}</div>
-                      </div>
-                      {card.owned ? (
-                        <div style={{display:"flex",alignItems:"center",gap:4,flexShrink:0}}>
-                          {reps>0&&<div style={{background:"rgba(240,192,64,0.15)",color:T.gold,fontWeight:700,fontSize:10,padding:"1px 7px",borderRadius:10}}>×{reps}</div>}
-                          <button onClick={e=>{e.stopPropagation();onRepeat(collId,card.id,-1);}}
-                            style={{width:20,height:20,borderRadius:4,background:T.surface,border:`1px solid ${T.border}`,color:T.textDim,fontSize:13,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>−</button>
-                          <span style={{fontSize:12,fontWeight:700,color:reps>0?T.gold:T.textDim,minWidth:12,textAlign:"center"}}>{reps}</span>
-                          <button onClick={e=>{e.stopPropagation();onRepeat(collId,card.id,1);}}
-                            style={{width:20,height:20,borderRadius:4,background:T.surface,border:`1px solid ${T.border}`,color:T.textDim,fontSize:13,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>+</button>
+
+              {viewMode==='list' ? (
+                /* LIST VIEW */
+                <div style={{background:T.surface2,borderRadius:"0 0 10px 10px",overflow:"hidden"}}>
+                  {teamCards.map((card,i)=>{
+                    const reps=repeatsMap[card.id]||0;
+                    return (
+                      <div key={card.id} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",
+                          background:card.owned?"rgba(34,197,94,0.04)":"transparent",
+                          borderBottom:i<teamCards.length-1?`1px solid ${T.border}`:"none"}}>
+                        <div onClick={()=>onToggle(collId,card.id,!card.owned)}
+                          style={{width:22,height:22,borderRadius:5,border:`2px solid ${card.owned?T.green:T.border}`,
+                            background:card.owned?T.green:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,cursor:"pointer",transition:"all 0.15s"}}>
+                          {card.owned&&<span style={{fontSize:12,color:"#000",fontWeight:900}}>✓</span>}
                         </div>
-                      ) : (
-                        <span style={{fontSize:10,color:T.red,fontWeight:700,flexShrink:0}}>FALTA</span>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+                        <div style={{flex:1,minWidth:0}}>
+                          <div style={{fontSize:14,fontWeight:600,color:card.owned?T.text:T.textDim,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{card.name}</div>
+                          <div style={{fontSize:10,color:T.textDim,marginTop:1}}>#{card.num}</div>
+                        </div>
+                        {card.owned ? (
+                          <div style={{display:"flex",alignItems:"center",gap:4,flexShrink:0}}>
+                            {reps>0&&<div style={{background:"rgba(240,192,64,0.15)",color:T.gold,fontWeight:700,fontSize:10,padding:"1px 7px",borderRadius:10}}>×{reps}</div>}
+                            <button onClick={e=>{e.stopPropagation();onRepeat(collId,card.id,-1);}}
+                              style={{width:20,height:20,borderRadius:4,background:T.surface,border:`1px solid ${T.border}`,color:T.textDim,fontSize:13,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>−</button>
+                            <span style={{fontSize:12,fontWeight:700,color:reps>0?T.gold:T.textDim,minWidth:12,textAlign:"center"}}>{reps}</span>
+                            <button onClick={e=>{e.stopPropagation();onRepeat(collId,card.id,1);}}
+                              style={{width:20,height:20,borderRadius:4,background:T.surface,border:`1px solid ${T.border}`,color:T.textDim,fontSize:13,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>+</button>
+                          </div>
+                        ) : (
+                          <span style={{fontSize:10,color:T.red,fontWeight:700,flexShrink:0}}>FALTA</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                /* CARDS VIEW */
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+                  {teamCards.map(card=>{
+                    const reps=repeatsMap[card.id]||0;
+                    return (
+                      <div key={card.id} onClick={()=>onToggle(collId,card.id,!card.owned)}
+                        style={{
+                          background: card.owned
+                            ? `linear-gradient(150deg,${accent}cc,${accent}77)`
+                            : T.surface2,
+                          border:`1px solid ${card.owned?accent+'44':T.border}`,
+                          borderRadius:12,padding:"12px 10px 10px",
+                          cursor:"pointer",position:"relative",overflow:"hidden",
+                          opacity:card.owned?1:0.5,
+                          minHeight:90,display:"flex",flexDirection:"column",justifyContent:"space-between",
+                        }}>
+                        {/* Watermark number */}
+                        <div style={{position:"absolute",right:-2,top:-6,fontSize:44,fontWeight:900,
+                          color:"rgba(255,255,255,0.07)",fontFamily:"Inter,sans-serif",lineHeight:1}}>
+                          {card.num}
+                        </div>
+                        {/* Top */}
+                        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:6}}>
+                          <div style={{fontSize:9,fontWeight:700,color:"rgba(255,255,255,0.5)",letterSpacing:1}}>#{card.num}</div>
+                          {card.owned
+                            ? <div style={{width:7,height:7,borderRadius:"50%",background:"#22c55e"}}/>
+                            : <div style={{width:7,height:7,borderRadius:"50%",background:"rgba(255,255,255,0.15)"}}/>
+                          }
+                        </div>
+                        {/* Name */}
+                        <div style={{fontSize:12,fontWeight:800,color:"#fff",lineHeight:1.2,
+                          overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical"}}>
+                          {card.name}
+                        </div>
+                        {/* Bottom */}
+                        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-end",marginTop:8}}>
+                          <div style={{fontSize:8,fontWeight:700,color:"rgba(255,255,255,0.35)",letterSpacing:2}}>CROMA</div>
+                          {reps>0 && (
+                            <div style={{background:"rgba(240,192,64,0.2)",color:T.gold,fontWeight:800,fontSize:10,padding:"1px 7px",borderRadius:10}}>×{reps}</div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           );
         })}
