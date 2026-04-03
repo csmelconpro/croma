@@ -253,17 +253,13 @@ function HomeScreen({ allOwned, allRepeats, onEnter, onNav, T, theme, toggleThem
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');`}</style>
 
       {/* HEADER */}
-      <div style={{padding:"56px 20px 20px",display:"flex",flexDirection:"column",alignItems:"center",position:"relative"}}>
-        <CromaLogo height={64} color={T.logoColor}/>
-        <button onClick={toggleTheme}
-          style={{position:"absolute",bottom:20,right:20,background:T.surface2,border:`1px solid ${T.border}`,
-            borderRadius:20,padding:"4px 10px",fontSize:10,color:T.textDim,cursor:"pointer",fontFamily:"'Inter',sans-serif"}}>
-          {theme==='dark'?'☀️':'🌙'}
-        </button>
+      <div style={{padding:"56px 20px 32px",display:"flex",flexDirection:"column",alignItems:"center"}}>
+        <CromaLogo height={90} color={T.logoColor}/>
       </div>
 
       <div style={{padding:"0 16px"}}>
         {/* COLLECTIONS */}
+        <div style={{height:1,background:T.border,marginBottom:24}}/>
         <SectionLabel T={T}>Mis Colecciones</SectionLabel>
         {Object.values(COLLECTIONS).map(coll => {
           const ownedMap = coll.id==="laliga" ? laligaOwned : mundialOwned;
@@ -298,7 +294,8 @@ function HomeScreen({ allOwned, allRepeats, onEnter, onNav, T, theme, toggleThem
         })}
 
         {/* CASI + LEJOS en paralelo */}
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginTop:8,marginBottom:24}}>
+        <div style={{height:1,background:T.border,marginBottom:24,marginTop:8}}/>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:24}}>
           <div>
             <SectionLabel T={T}>Casi 🔥</SectionLabel>
             <div style={{background:T.surface,border:`1px solid ${T.border}`,borderRadius:12,overflow:"hidden"}}>
@@ -392,6 +389,14 @@ function HomeScreen({ allOwned, allRepeats, onEnter, onNav, T, theme, toggleThem
             style={{width:44,height:24,borderRadius:12,background:showCost?T.accent:T.surface2,cursor:"pointer",position:"relative",transition:"background 0.2s"}}>
             <div style={{position:"absolute",top:2,left:showCost?22:2,width:20,height:20,borderRadius:"50%",background:"#fff",transition:"left 0.2s"}}/>
           </div>
+        </div>
+        {/* THEME TOGGLE - bottom right */}
+        <div style={{display:"flex",justifyContent:"flex-end",marginBottom:16}}>
+          <button onClick={toggleTheme}
+            style={{background:T.surface2,border:`1px solid ${T.border}`,borderRadius:20,padding:"6px 14px",
+              fontSize:12,color:T.textDim,cursor:"pointer",fontFamily:"'Inter',sans-serif"}}>
+            {theme==='dark'?'☀️ Modo claro':'🌙 Modo oscuro'}
+          </button>
         </div>
       </div>
     </div>
@@ -526,21 +531,30 @@ function StatsScreen({ allOwned, onBack, T }) {
   const teamList = useMemo(()=>buildList(TEAM_SECS[activeCollId]||[]),[activeCollId,ownedMap,sortBy]);
   const specList = useMemo(()=>buildList(SPEC_SECS[activeCollId]||[]),[activeCollId,ownedMap]);
 
-  const renderRow = (item,i,arr,color) => (
-    <div key={item.team} style={{display:"flex",alignItems:"center",gap:12,padding:"11px 0",borderBottom:i<arr.length-1?`1px solid ${T.border}`:"none"}}>
-      <Shield team={item.team} size={32}/>
-      <div style={{flex:1,minWidth:0}}>
-        <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:4,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.team}</div>
-        <div style={{height:3,background:T.surface2,borderRadius:4,overflow:"hidden"}}>
-          <div style={{height:"100%",width:`${item.pct}%`,background:color,borderRadius:4}}/>
+  const renderRow = (item,i,arr,color) => {
+    // Color gradient based on % — red < 40%, gold 40-79%, green 80%+
+    const pctColor = item.pct===100 ? T.green : item.pct>=80 ? T.green : item.pct>=40 ? T.gold : T.red;
+    const barGrad = item.pct===100
+      ? T.green
+      : item.pct>=80 ? `linear-gradient(90deg,${T.gold},${T.green})`
+      : item.pct>=40 ? `linear-gradient(90deg,${T.red},${T.gold})`
+      : T.red;
+    return (
+      <div key={item.team} style={{display:"flex",alignItems:"center",gap:12,padding:"11px 0",borderBottom:i<arr.length-1?`1px solid ${T.border}`:"none"}}>
+        <Shield team={item.team} size={32}/>
+        <div style={{flex:1,minWidth:0}}>
+          <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:4,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.team}</div>
+          <div style={{height:3,background:T.surface2,borderRadius:4,overflow:"hidden"}}>
+            <div style={{height:"100%",width:`${item.pct}%`,background:barGrad,borderRadius:4}}/>
+          </div>
+        </div>
+        <div style={{textAlign:"right",minWidth:60}}>
+          <div style={{fontSize:13,fontWeight:800,color:pctColor}}>{item.pct}%</div>
+          <div style={{fontSize:10,color:T.textDim}}>{item.owned}/{item.total}</div>
         </div>
       </div>
-      <div style={{textAlign:"right",minWidth:60}}>
-        <div style={{fontSize:13,fontWeight:800,color:item.pct===100?T.green:item.pct>50?T.gold:T.red}}>{item.pct}%</div>
-        <div style={{fontSize:10,color:T.textDim}}>{item.owned}/{item.total}</div>
-      </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div style={{minHeight:"100vh",background:T.bg,color:T.text,paddingBottom:80,fontFamily:"'Inter',sans-serif"}}>
