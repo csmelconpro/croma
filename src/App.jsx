@@ -32,46 +32,233 @@ const TEAMS = {
   "Villarreal CF":      {p:"#f5c500",s:"#1a1a1a",abbr:"VIL",shape:"plain"},
 };
 
-// ─── PES-STYLE SHIELD ────────────────────────────────────────────────────────
+// ─── CUSTOM SHIELDS ──────────────────────────────────────────────────────────
 function Shield({ team, size = 32 }) {
-  const t = TEAMS[team] || { p:"#444", s:"#888", abbr:(team||"?").slice(0,3).toUpperCase(), shape:"plain" };
-  const w = size, h = size;
-  const shield = `M${w*.1},${h*.08} L${w*.9},${h*.08} L${w*.9},${h*.6} Q${w*.9},${h*.84} ${w*.5},${h*.95} Q${w*.1},${h*.84} ${w*.1},${h*.6} Z`;
+  const s = size;
+  const sh = `M${s*.1},${s*.08} L${s*.9},${s*.08} L${s*.9},${s*.6} Q${s*.9},${s*.84} ${s*.5},${s*.95} Q${s*.1},${s*.84} ${s*.1},${s*.6} Z`;
+  const clip = `shield_${size}`;
 
-  let inner = null;
-  if (t.shape === "half") {
-    inner = <path d={`M${w*.5},${h*.08} L${w*.9},${h*.08} L${w*.9},${h*.6} Q${w*.9},${h*.84} ${w*.5},${h*.95} Z`} fill={t.s} opacity="0.3"/>;
-  } else if (t.shape === "stripes") {
-    inner = <>
-      <rect x={w*.28} y={h*.08} width={w*.15} height={h*.87} fill={t.s} opacity="0.25" clipPath="url(#sh)"/>
-      <rect x={w*.57} y={h*.08} width={w*.15} height={h*.87} fill={t.s} opacity="0.25" clipPath="url(#sh)"/>
-    </>;
-  } else if (t.shape === "diagonal") {
-    inner = <path d={`M${w*.1},${h*.08} L${w*.9},${h*.08} L${w*.1},${h*.7} Z`} fill={t.s} opacity="0.2"/>;
-  } else if (t.shape === "royal") {
-    inner = <>
-      <path d={`M${w*.5},${h*.08} L${w*.9},${h*.08} L${w*.9},${h*.6} Q${w*.9},${h*.84} ${w*.5},${h*.95} Z`} fill={t.s} opacity="0.12"/>
-      <line x1={w*.5} y1={h*.08} x2={w*.5} y2={h*.95} stroke={t.s} strokeWidth={w*.04} opacity="0.4"/>
-    </>;
-  }
+  const shields = {
+    "Deportivo Alavés": (
+      // Blue/white vertical half
+      <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} style={{flexShrink:0}}>
+        <defs><clipPath id={clip}><path d={sh}/></clipPath></defs>
+        <path d={sh} fill="#1a3a6b"/>
+        <rect x={s*.5} y="0" width={s*.5} height={s} fill="#ffffff" clipPath={`url(#${clip})`}/>
+        <path d={sh} fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1"/>
+        <text x={s*.5} y={s*.58} textAnchor="middle" dominantBaseline="middle" fontSize={s*.2} fontWeight="900" fill="#1a3a6b" style={{fontFamily:"Inter,sans-serif"}}>{`ALA`}</text>
+      </svg>
+    ),
+    "Athletic Club": (
+      // Red/white vertical stripes
+      <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} style={{flexShrink:0}}>
+        <defs><clipPath id={clip}><path d={sh}/></clipPath></defs>
+        <path d={sh} fill="#c8102e"/>
+        <rect x={s*.28} y="0" width={s*.22} height={s} fill="#ffffff" clipPath={`url(#${clip})`}/>
+        <rect x={s*.62} y="0" width={s*.22} height={s} fill="#ffffff" clipPath={`url(#${clip})`}/>
+        <path d={sh} fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="1"/>
+        <text x={s*.5} y={s*.58} textAnchor="middle" dominantBaseline="middle" fontSize={s*.19} fontWeight="900" fill="#fff" style={{fontFamily:"Inter,sans-serif"}}>{`ATH`}</text>
+      </svg>
+    ),
+    "Atlético de Madrid": (
+      // Red top, navy blue bottom stripe
+      <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} style={{flexShrink:0}}>
+        <defs><clipPath id={clip}><path d={sh}/></clipPath></defs>
+        <path d={sh} fill="#c8102e"/>
+        <rect x="0" y={s*.55} width={s} height={s*.5} fill="#002d62" clipPath={`url(#${clip})`}/>
+        <rect x="0" y={s*.52} width={s} height={s*.06} fill="#ffffff" clipPath={`url(#${clip})`}/>
+        <path d={sh} fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="1"/>
+        <text x={s*.5} y={s*.42} textAnchor="middle" dominantBaseline="middle" fontSize={s*.19} fontWeight="900" fill="#fff" style={{fontFamily:"Inter,sans-serif"}}>{`ATM`}</text>
+      </svg>
+    ),
+    "FC Barcelona": (
+      // Blaugrana diagonal stripes
+      <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} style={{flexShrink:0}}>
+        <defs><clipPath id={clip}><path d={sh}/></clipPath></defs>
+        <path d={sh} fill="#a50044"/>
+        <rect x={s*.18} y="0" width={s*.22} height={s} fill="#004d98" clipPath={`url(#${clip})`}/>
+        <rect x={s*.52} y="0" width={s*.22} height={s} fill="#004d98" clipPath={`url(#${clip})`}/>
+        <path d={sh} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1"/>
+        <text x={s*.5} y={s*.58} textAnchor="middle" dominantBaseline="middle" fontSize={s*.19} fontWeight="900" fill="#ffd700" style={{fontFamily:"Inter,sans-serif"}}>{`BAR`}</text>
+      </svg>
+    ),
+    "Real Betis": (
+      // Green/white halves
+      <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} style={{flexShrink:0}}>
+        <defs><clipPath id={clip}><path d={sh}/></clipPath></defs>
+        <path d={sh} fill="#00954c"/>
+        <rect x={s*.5} y="0" width={s*.5} height={s} fill="#ffffff" clipPath={`url(#${clip})`}/>
+        <path d={sh} fill="none" stroke="rgba(0,0,0,0.2)" strokeWidth="1"/>
+        <text x={s*.5} y={s*.58} textAnchor="middle" dominantBaseline="middle" fontSize={s*.2} fontWeight="900" fill="#00954c" style={{fontFamily:"Inter,sans-serif"}}>{`BET`}</text>
+      </svg>
+    ),
+    "RC Celta": (
+      // Sky blue/white diagonal
+      <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} style={{flexShrink:0}}>
+        <defs><clipPath id={clip}><path d={sh}/></clipPath></defs>
+        <path d={sh} fill="#6ecef5"/>
+        <path d={`M${s*.1},${s*.08} L${s*.9},${s*.08} L${s*.1},${s*.7} Z`} fill="#ffffff" clipPath={`url(#${clip})`}/>
+        <path d={sh} fill="none" stroke="rgba(0,0,0,0.15)" strokeWidth="1"/>
+        <text x={s*.5} y={s*.58} textAnchor="middle" dominantBaseline="middle" fontSize={s*.2} fontWeight="900" fill="#005a9e" style={{fontFamily:"Inter,sans-serif"}}>{`CEL`}</text>
+      </svg>
+    ),
+    "Elche CF": (
+      // Green with white cross
+      <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} style={{flexShrink:0}}>
+        <defs><clipPath id={clip}><path d={sh}/></clipPath></defs>
+        <path d={sh} fill="#007340"/>
+        <rect x="0" y={s*.43} width={s} height={s*.14} fill="#ffffff" clipPath={`url(#${clip})`}/>
+        <path d={sh} fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="1"/>
+        <text x={s*.5} y={s*.72} textAnchor="middle" dominantBaseline="middle" fontSize={s*.19} fontWeight="900" fill="#fff" style={{fontFamily:"Inter,sans-serif"}}>{`ELC`}</text>
+      </svg>
+    ),
+    "RCD Espanyol": (
+      // Blue with white diagonal sash
+      <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} style={{flexShrink:0}}>
+        <defs><clipPath id={clip}><path d={sh}/></clipPath></defs>
+        <path d={sh} fill="#003da5"/>
+        <path d={`M${s*.25},${s*.08} L${s*.75},${s*.08} L${s*.9},${s*.6} L${s*.4},${s*.6} Z`} fill="#ffffff" opacity="0.3" clipPath={`url(#${clip})`}/>
+        <path d={sh} fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="1"/>
+        <text x={s*.5} y={s*.58} textAnchor="middle" dominantBaseline="middle" fontSize={s*.19} fontWeight="900" fill="#fff" style={{fontFamily:"Inter,sans-serif"}}>{`ESP`}</text>
+      </svg>
+    ),
+    "Getafe CF": (
+      // Blue with darker bottom
+      <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} style={{flexShrink:0}}>
+        <defs><clipPath id={clip}><path d={sh}/></clipPath></defs>
+        <path d={sh} fill="#005ca9"/>
+        <rect x="0" y={s*.6} width={s} height={s*.4} fill="#003d72" clipPath={`url(#${clip})`}/>
+        <path d={sh} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1"/>
+        <text x={s*.5} y={s*.48} textAnchor="middle" dominantBaseline="middle" fontSize={s*.2} fontWeight="900" fill="#fff" style={{fontFamily:"Inter,sans-serif"}}>{`GET`}</text>
+      </svg>
+    ),
+    "Girona FC": (
+      // Red/white vertical halves
+      <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} style={{flexShrink:0}}>
+        <defs><clipPath id={clip}><path d={sh}/></clipPath></defs>
+        <path d={sh} fill="#cc0000"/>
+        <rect x={s*.5} y="0" width={s*.5} height={s} fill="#ffffff" clipPath={`url(#${clip})`}/>
+        <path d={sh} fill="none" stroke="rgba(0,0,0,0.2)" strokeWidth="1"/>
+        <text x={s*.5} y={s*.58} textAnchor="middle" dominantBaseline="middle" fontSize={s*.2} fontWeight="900" fill="#cc0000" style={{fontFamily:"Inter,sans-serif"}}>{`GIR`}</text>
+      </svg>
+    ),
+    "Levante UD": (
+      // Blue/red halves
+      <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} style={{flexShrink:0}}>
+        <defs><clipPath id={clip}><path d={sh}/></clipPath></defs>
+        <path d={sh} fill="#004fa3"/>
+        <rect x={s*.5} y="0" width={s*.5} height={s} fill="#c8102e" clipPath={`url(#${clip})`}/>
+        <path d={sh} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1"/>
+        <text x={s*.5} y={s*.58} textAnchor="middle" dominantBaseline="middle" fontSize={s*.2} fontWeight="900" fill="#fff" style={{fontFamily:"Inter,sans-serif"}}>{`LEV`}</text>
+      </svg>
+    ),
+    "Real Madrid": (
+      // Dark navy with gold trim
+      <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} style={{flexShrink:0}}>
+        <defs><clipPath id={clip}><path d={sh}/></clipPath></defs>
+        <path d={sh} fill="#0a1628"/>
+        <path d={`M${s*.1},${s*.08} L${s*.9},${s*.08} L${s*.9},${s*.18} L${s*.1},${s*.18} Z`} fill="#d4af37" clipPath={`url(#${clip})`}/>
+        <path d={`M${s*.1},${s*.75} L${s*.9},${s*.75} Q${s*.9},${s*.84} ${s*.5},${s*.95} Q${s*.1},${s*.84} ${s*.1},${s*.75} Z`} fill="#d4af37" clipPath={`url(#${clip})`}/>
+        <path d={sh} fill="none" stroke="#d4af37" strokeWidth="1.5" opacity="0.6"/>
+        <text x={s*.5} y={s*.52} textAnchor="middle" dominantBaseline="middle" fontSize={s*.19} fontWeight="900" fill="#d4af37" style={{fontFamily:"Inter,sans-serif"}}>{`RMA`}</text>
+      </svg>
+    ),
+    "RCD Mallorca": (
+      // Red/black halves
+      <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} style={{flexShrink:0}}>
+        <defs><clipPath id={clip}><path d={sh}/></clipPath></defs>
+        <path d={sh} fill="#c8102e"/>
+        <rect x={s*.5} y="0" width={s*.5} height={s} fill="#1a1a1a" clipPath={`url(#${clip})`}/>
+        <path d={sh} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1"/>
+        <text x={s*.5} y={s*.58} textAnchor="middle" dominantBaseline="middle" fontSize={s*.2} fontWeight="900" fill="#fff" style={{fontFamily:"Inter,sans-serif"}}>{`MAL`}</text>
+      </svg>
+    ),
+    "CA Osasuna": (
+      // Red with navy chevron
+      <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} style={{flexShrink:0}}>
+        <defs><clipPath id={clip}><path d={sh}/></clipPath></defs>
+        <path d={sh} fill="#c8102e"/>
+        <path d={`M${s*.1},${s*.08} L${s*.5},${s*.45} L${s*.9},${s*.08} L${s*.9},${s*.3} L${s*.5},${s*.65} L${s*.1},${s*.3} Z`} fill="#003da5" clipPath={`url(#${clip})`}/>
+        <path d={sh} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1"/>
+        <text x={s*.5} y={s*.75} textAnchor="middle" dominantBaseline="middle" fontSize={s*.19} fontWeight="900" fill="#fff" style={{fontFamily:"Inter,sans-serif"}}>{`OSA`}</text>
+      </svg>
+    ),
+    "Real Oviedo": (
+      // Blue with white cross
+      <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} style={{flexShrink:0}}>
+        <defs><clipPath id={clip}><path d={sh}/></clipPath></defs>
+        <path d={sh} fill="#003da5"/>
+        <rect x="0" y={s*.43} width={s} height={s*.14} fill="#ffffff" clipPath={`url(#${clip})`}/>
+        <rect x={s*.43} y="0" width={s*.14} height={s} fill="#ffffff" clipPath={`url(#${clip})`}/>
+        <path d={sh} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1"/>
+        <text x={s*.5} y={s*.72} textAnchor="middle" dominantBaseline="middle" fontSize={s*.19} fontWeight="900" fill="#fff" style={{fontFamily:"Inter,sans-serif"}}>{`OVI`}</text>
+      </svg>
+    ),
+    "Rayo Vallecano": (
+      // White with red diagonal bolt
+      <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} style={{flexShrink:0}}>
+        <defs><clipPath id={clip}><path d={sh}/></clipPath></defs>
+        <path d={sh} fill="#ffffff"/>
+        <path d={`M${s*.3},${s*.08} L${s*.9},${s*.08} L${s*.6},${s*.95} Q${s*.1},${s*.84} ${s*.1},${s*.6} Z`} fill="#cc0000" clipPath={`url(#${clip})`}/>
+        <path d={sh} fill="none" stroke="rgba(0,0,0,0.2)" strokeWidth="1"/>
+        <text x={s*.35} y={s*.45} textAnchor="middle" dominantBaseline="middle" fontSize={s*.19} fontWeight="900" fill="#cc0000" style={{fontFamily:"Inter,sans-serif"}}>{`RAY`}</text>
+      </svg>
+    ),
+    "Real Sociedad": (
+      // Blue/white diagonal halves
+      <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} style={{flexShrink:0}}>
+        <defs><clipPath id={clip}><path d={sh}/></clipPath></defs>
+        <path d={sh} fill="#003da5"/>
+        <path d={`M${s*.9},${s*.08} L${s*.9},${s*.6} Q${s*.9},${s*.84} ${s*.5},${s*.95} L${s*.1},${s*.7} Z`} fill="#ffffff" opacity="0.3" clipPath={`url(#${clip})`}/>
+        <path d={sh} fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="1"/>
+        <text x={s*.5} y={s*.52} textAnchor="middle" dominantBaseline="middle" fontSize={s*.19} fontWeight="900" fill="#fff" style={{fontFamily:"Inter,sans-serif"}}>{`RSO`}</text>
+      </svg>
+    ),
+    "Sevilla FC": (
+      // Red/white halves with gold accent
+      <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} style={{flexShrink:0}}>
+        <defs><clipPath id={clip}><path d={sh}/></clipPath></defs>
+        <path d={sh} fill="#ffffff"/>
+        <rect x={s*.5} y="0" width={s*.5} height={s} fill="#c8102e" clipPath={`url(#${clip})`}/>
+        <path d={`M${s*.1},${s*.08} L${s*.9},${s*.08} L${s*.9},${s*.16} L${s*.1},${s*.16} Z`} fill="#d4af37" clipPath={`url(#${clip})`}/>
+        <path d={sh} fill="none" stroke="rgba(0,0,0,0.15)" strokeWidth="1"/>
+        <text x={s*.5} y={s*.58} textAnchor="middle" dominantBaseline="middle" fontSize={s*.2} fontWeight="900" fill="#c8102e" style={{fontFamily:"Inter,sans-serif"}}>{`SEV`}</text>
+      </svg>
+    ),
+    "Valencia CF": (
+      // Black/orange halves
+      <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} style={{flexShrink:0}}>
+        <defs><clipPath id={clip}><path d={sh}/></clipPath></defs>
+        <path d={sh} fill="#1a1a1a"/>
+        <rect x={s*.5} y="0" width={s*.5} height={s} fill="#f5a623" clipPath={`url(#${clip})`}/>
+        <path d={sh} fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1"/>
+        <text x={s*.5} y={s*.58} textAnchor="middle" dominantBaseline="middle" fontSize={s*.2} fontWeight="900" fill="#fff" style={{fontFamily:"Inter,sans-serif"}}>{`VAL`}</text>
+      </svg>
+    ),
+    "Villarreal CF": (
+      // Yellow with dark trim
+      <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} style={{flexShrink:0}}>
+        <defs><clipPath id={clip}><path d={sh}/></clipPath></defs>
+        <path d={sh} fill="#f5c500"/>
+        <path d={`M${s*.1},${s*.08} L${s*.9},${s*.08} L${s*.9},${s*.18} L${s*.1},${s*.18} Z`} fill="#1a1a1a" clipPath={`url(#${clip})`}/>
+        <path d={`M${s*.1},${s*.75} L${s*.9},${s*.75} Q${s*.9},${s*.84} ${s*.5},${s*.95} Q${s*.1},${s*.84} ${s*.1},${s*.75} Z`} fill="#1a1a1a" clipPath={`url(#${clip})`}/>
+        <path d={sh} fill="none" stroke="rgba(0,0,0,0.2)" strokeWidth="1"/>
+        <text x={s*.5} y={s*.52} textAnchor="middle" dominantBaseline="middle" fontSize={s*.19} fontWeight="900" fill="#1a1a1a" style={{fontFamily:"Inter,sans-serif"}}>{`VIL`}</text>
+      </svg>
+    ),
+  };
 
-  return (
-    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{flexShrink:0}}>
-      <defs>
-        <clipPath id="sh">
-          <path d={shield}/>
-        </clipPath>
-      </defs>
-      <path d={shield} fill={t.p}/>
-      {inner}
-      <path d={shield} fill="none" stroke="rgba(255,255,255,0.18)" strokeWidth="1"/>
-      <text x={w*.5} y={h*.6} textAnchor="middle" dominantBaseline="middle"
-        fontSize={w*.19} fontWeight="800" fill="#fff"
-        style={{fontFamily:"'Inter','Arial',sans-serif",letterSpacing:"-0.5px"}}>
-        {t.abbr}
+  const fallback = (
+    <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} style={{flexShrink:0}}>
+      <path d={sh} fill="#333"/>
+      <path d={sh} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1"/>
+      <text x={s*.5} y={s*.58} textAnchor="middle" dominantBaseline="middle" fontSize={s*.19} fontWeight="900" fill="#fff" style={{fontFamily:"Inter,sans-serif"}}>
+        {(team||"?").slice(0,3).toUpperCase()}
       </text>
     </svg>
   );
+
+  return shields[team] || fallback;
 }
 
 // ─── LOGOS ────────────────────────────────────────────────────────────────────
