@@ -596,7 +596,7 @@ function HomeScreen({ allOwned, allRepeats, onEnter, onNav, T, theme, toggleThem
 
       {/* HEADER */}
       <div style={{padding:"56px 20px 32px",display:"flex",flexDirection:"column",alignItems:"center"}}>
-        <CromaLogo height={90} color={T.logoColor}/>
+        <CromaLogo height={120} color={T.logoColor}/>
       </div>
 
       <div style={{padding:"0 16px"}}>
@@ -735,6 +735,14 @@ function HomeScreen({ allOwned, allRepeats, onEnter, onNav, T, theme, toggleThem
             <div style={{position:"absolute",top:2,left:showCost?22:2,width:20,height:20,borderRadius:"50%",background:"#fff",transition:"left 0.2s"}}/>
           </div>
         </div>
+        {/* DISCLAIMER */}
+        <div style={{textAlign:"center",padding:"20px 16px 8px",borderTop:`1px solid ${T.border}`,marginTop:8}}>
+          <div style={{fontSize:9,color:T.textDim,opacity:0.5,letterSpacing:0.5,lineHeight:1.6}}>
+            CROMA no está afiliada ni patrocinada por Panini, LaLiga, FIFA ni ninguna entidad oficial.
+            Los nombres de equipos y jugadores se usan con fines informativos.
+          </div>
+        </div>
+
         {/* THEME TOGGLE - bottom right */}
         <div style={{display:"flex",justifyContent:"flex-end",marginBottom:16}}>
           <button onClick={toggleTheme}
