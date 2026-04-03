@@ -98,12 +98,13 @@ function LaLigaIcon({ size = 46 }) {
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{flexShrink:0}}>
       <defs>
         <linearGradient id="llGrad" x1="0" y1="0" x2={size} y2={size} gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#cf9b15"/>
-          <stop offset="50%" stopColor="#e21a1a"/>
-          <stop offset="100%" stopColor="#e21818"/>
+          <stop offset="0%" stopColor="#e06016"/>
+          <stop offset="50%" stopColor="#e4d50e"/>
+          <stop offset="100%" stopColor="#ce6767"/>
         </linearGradient>
       </defs>
-      {/* Background */}
+      {/* Background */}npm run build
+
       <rect width={size} height={size} rx={size*0.22} fill="url(#llGrad)"/>
       {/* Ball circle */}
       <circle cx={cx} cy={cy} r={r} fill={w}/>
