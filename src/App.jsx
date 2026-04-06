@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
-import LALIGA_CARDS from './data/laliga.js';
-import MUNDIAL_CARDS from './data/mundial.js';
+import { LALIGA_CARDS } from './data/laliga.js';
+import { MUNDIAL_CARDS } from './data/mundial.js';
 
 // ─── THEMES ──────────────────────────────────────────────────────────────────
 const THEMES = {
