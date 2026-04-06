@@ -1729,6 +1729,35 @@ export default function App() {
     profile:<ProfileScreen allOwned={allOwned} onBack={()=>setScreen("home")} T={T}/>,
     achievements:<AchievementsScreen allOwned={allOwned} onBack={()=>setScreen("home")} T={T}/> };
 
+  if (screen==="collection" && activeCollId)
+    return <>
+      <CollectionGridScreen
+        collId={activeCollId}
+        ownedMap={allOwned[activeCollId]||{}}
+        repeatsMap={allRepeats[activeCollId]||{}}
+        onSelectGroup={handleSelectGroup}
+        onBack={()=>setScreen("home")}
+        T={T}
+      />
+      <NavBar screen={screen} onNav={handleNav} T={T}/>
+    </>;
+
+  if (screen==="group" && activeCollId && activeGroup)
+    return <>
+      <CollectionScreen
+        collId={activeCollId}
+        ownedMap={allOwned[activeCollId]||{}}
+        repeatsMap={allRepeats[activeCollId]||{}}
+        onToggle={handleToggle}
+        onRepeat={handleRepeat}
+        onBack={()=>setScreen("collection")}
+        T={T}
+        filterGroup={activeGroup}
+        filterSection={activeGroupSection}
+      />
+      <NavBar screen={screen} onNav={handleNav} T={T}/>
+    </>;
+
   return (
     <>
       {screens[screen] || <HomeScreen allOwned={allOwned} allRepeats={allRepeats}
