@@ -954,7 +954,7 @@ const NATIONAL = {
   "Uruguay":{"p":"#5EB6E4","s":"#ffffff"},"Uzbekistán":{"p":"#1EB53A","s":"#ffffff"},
 };
 
-function TeamScreen({ team, collId, ownedMap, onBack, T }) {
+function TeamScreen({ team, collId, ownedMap, repeatsMap, onToggle, onRepeat, onBack, T }) {
   const t = TEAMS[team] || NATIONAL[team] || { p:"#1a3a6b", s:"#ffffff", abbr:"?" };
   const coll = COLLECTIONS[collId];
   const teamCards = coll.cards.filter(c => c.team === team);
@@ -1013,8 +1013,20 @@ function TeamScreen({ team, collId, ownedMap, onBack, T }) {
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
               {cards.map(card => {
                 const isOwned = ownedMap[card.id]!==undefined ? ownedMap[card.id] : card.owned;
+                const reps = repeatsMap ? (repeatsMap[card.id]||0) : 0;
                 return (
-                  <PlayerCard key={card.id} card={card} owned={isOwned} T={T} teamPrimary={t.p} teamSecondary={t.s}/>
+                  <div key={card.id} onClick={()=>onToggle&&onToggle(collId,card.id,!isOwned)} style={{cursor:'pointer'}}>
+                    <PlayerCard card={card} owned={isOwned} T={T} teamPrimary={t.p} teamSecondary={t.s}/>
+                    {isOwned && onRepeat && (
+                      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,marginTop:4}}>
+                        <button onClick={e=>{e.stopPropagation();onRepeat(collId,card.id,-1);}}
+                          style={{background:'rgba(255,255,255,0.1)',border:'none',color:'#fff',borderRadius:6,width:24,height:24,cursor:'pointer',fontSize:14}}>−</button>
+                        {reps > 0 && <span style={{fontSize:11,fontWeight:700,color:'#f0c040'}}>+{reps}</span>}
+                        <button onClick={e=>{e.stopPropagation();onRepeat(collId,card.id,1);}}
+                          style={{background:'rgba(255,255,255,0.1)',border:'none',color:'#fff',borderRadius:6,width:24,height:24,cursor:'pointer',fontSize:14}}>+</button>
+                      </div>
+                    )}
+                  </div>
                 );
               })}
             </div>
@@ -1361,7 +1373,8 @@ function CollectionGridScreen({ collId, ownedMap, repeatsMap, onSelectGroup, onB
                 {items.map(group => {
                   const pct = group.total > 0 ? Math.round(group.owned/group.total*100) : 0;
                   const teamData = TEAMS[group.key] || NATIONAL[group.key];
-                  const style = getSectionStyle(group.section === 'Regulares' || group.section === 'Selecciones' ? group.section : group.key);
+                  const isCountryGroup = (group.section === 'Contenders' && group.key !== 'Contenders - Grupos') || group.section === 'Selecciones' || group.section === 'Regulares';
+                  const style = getSectionStyle(isCountryGroup ? group.section : group.key);
                   const accent = teamData ? teamData.p : style.accent;
                   const grad = teamData
                     ? [`${teamData.p}dd`, `${teamData.p}66`]
@@ -1388,7 +1401,9 @@ function CollectionGridScreen({ collId, ownedMap, repeatsMap, onSelectGroup, onB
                       <div style={{marginBottom:6}}>
                         {teamData
                           ? <Shield team={group.key} size={36}/>
-                          : <div style={{fontSize:28,lineHeight:1}}>{style.label}</div>
+                          : (group.section === 'Contenders' && group.key !== 'Contenders - Grupos')
+                            ? <Shield team={group.key} size={36}/>
+                            : <div style={{fontSize:28,lineHeight:1}}>{style.label}</div>
                         }
                       </div>
 
@@ -1715,13 +1730,14 @@ export default function App() {
   const handleSelectGroup = (group, section) => {
     setActiveGroup(group);
     setActiveGroupSection(section);
-    setScreen("group");
+    setActiveTeamName(group);
+    setScreen("team");
   };
 
   const showNav = screen !== "achievements";
 
   if (screen==="team" && activeCollId && activeTeamName)
-    return <><TeamScreen team={activeTeamName} collId={activeCollId} ownedMap={allOwned[activeCollId]||{}} onBack={()=>setScreen("home")} T={T}/></>;
+    return <><TeamScreen team={activeTeamName} collId={activeCollId} ownedMap={allOwned[activeCollId]||{}} repeatsMap={allRepeats[activeCollId]||{}} onToggle={handleToggle} onRepeat={handleRepeat} onBack={()=>setScreen("collection")} T={T}/></>;
 
   if (screen==="collection" && activeCollId)
     return <>
