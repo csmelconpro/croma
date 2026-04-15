@@ -1709,13 +1709,6 @@ export default function App() {
   };
   const handleNav = s => { setScreen(s); setActiveCollId(null); };
 
-  if (screen==="team"&&activeCollId&&activeTeamName)
-    return <><TeamScreen team={activeTeamName} collId={activeCollId} ownedMap={allOwned[activeCollId]||{}} onBack={()=>setScreen("home")} T={T}/></>;
-
-  if (screen==="collection"&&activeCollId)
-    return <CollectionScreen collId={activeCollId} ownedMap={allOwned[activeCollId]||{}} repeatsMap={allRepeats[activeCollId]||{}}
-      onToggle={handleToggle} onRepeat={handleRepeat} onBack={()=>setScreen("home")} T={T}/>;
-
   const [activeGroup, setActiveGroup] = useState(null);
   const [activeGroupSection, setActiveGroupSection] = useState(null);
 
@@ -1725,10 +1718,10 @@ export default function App() {
     setScreen("group");
   };
 
-  const screens = { stats:<StatsScreen allOwned={allOwned} onBack={()=>setScreen("home")} T={T}/>,
-    repeats:<RepeatsScreen allOwned={allOwned} allRepeats={allRepeats} onBack={()=>setScreen("home")} T={T}/>,
-    profile:<ProfileScreen allOwned={allOwned} onBack={()=>setScreen("home")} T={T}/>,
-    achievements:<AchievementsScreen allOwned={allOwned} onBack={()=>setScreen("home")} T={T}/> };
+  const showNav = screen !== "achievements";
+
+  if (screen==="team" && activeCollId && activeTeamName)
+    return <><TeamScreen team={activeTeamName} collId={activeCollId} ownedMap={allOwned[activeCollId]||{}} onBack={()=>setScreen("home")} T={T}/></>;
 
   if (screen==="collection" && activeCollId)
     return <>
@@ -1759,12 +1752,19 @@ export default function App() {
       <NavBar screen={screen} onNav={handleNav} T={T}/>
     </>;
 
+  const screens = {
+    stats: <StatsScreen allOwned={allOwned} onBack={()=>setScreen("home")} T={T}/>,
+    repeats: <RepeatsScreen allOwned={allOwned} allRepeats={allRepeats} onBack={()=>setScreen("home")} T={T}/>,
+    profile: <ProfileScreen allOwned={allOwned} onBack={()=>setScreen("home")} T={T}/>,
+    achievements: <AchievementsScreen allOwned={allOwned} onBack={()=>setScreen("home")} T={T}/>
+  };
+
   return (
     <>
       {screens[screen] || <HomeScreen allOwned={allOwned} allRepeats={allRepeats}
         onEnter={id=>{setActiveCollId(id);setScreen("collection");}}
         onNav={handleNav} T={T} theme={theme} toggleTheme={toggleTheme} showCost={showCost} toggleCost={toggleCost}/>}
-      {screen!=="achievements" && <NavBar screen={screen} onNav={handleNav} T={T}/>}
+      {showNav && <NavBar screen={screen} onNav={handleNav} T={T}/>}
     </>
   );
 }
