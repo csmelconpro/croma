@@ -2,13 +2,13 @@ import { useState, useMemo } from "react";
 import { LALIGA_CARDS } from './data/laliga.js';
 import { MUNDIAL_CARDS } from './data/mundial.js';
 
-// ─── THEMES ──────────────────────────────────────────────────────────────────
+// - THEMES -
 const THEMES = {
   dark:  { bg:"#0f1014", surface:"#16181f", surface2:"#1e2028", border:"#252836", red:"#e8353a", green:"#22c55e", gold:"#f0c040", text:"#f0f1f5", textDim:"#6b7280", accent:"#f97316", logoColor:"#ffffff" },
   light: { bg:"#f4f4f8", surface:"#ffffff",  surface2:"#ebebf0", border:"#dde0ea", red:"#dc2626", green:"#16a34a", gold:"#ca8a04", text:"#0f1014", textDim:"#6b7280", accent:"#f97316", logoColor:"#0f1014" },
 };
 
-// ─── TEAMS ────────────────────────────────────────────────────────────────────
+// - TEAMS -
 const TEAMS = {
   "Deportivo Alavés":   {p:"#1a3a6b",s:"#ffffff",abbr:"ALA",shape:"half"},
   "Athletic Club":      {p:"#c8102e",s:"#ffffff",abbr:"ATH",shape:"stripes"},
@@ -32,7 +32,7 @@ const TEAMS = {
   "Villarreal CF":      {p:"#f5c500",s:"#1a1a1a",abbr:"VIL",shape:"plain"},
 };
 
-// ─── SHIELDS (Liga + Mundial) ────────────────────────────────────────────────
+// - SHIELDS (Liga + Mundial) -
 function Shield({ team, size = 32 }) {
   const s = size;
   const sh = `M${s*.1},${s*.08} L${s*.9},${s*.08} L${s*.9},${s*.6} Q${s*.9},${s*.84} ${s*.5},${s*.95} Q${s*.1},${s*.84} ${s*.1},${s*.6} Z`;
@@ -59,7 +59,7 @@ function Shield({ team, size = 32 }) {
   const BotCap = ({fill}) => <path d={`M${s*.1},${s*.75} L${s*.9},${s*.75} Q${s*.9},${s*.84} ${s*.5},${s*.95} Q${s*.1},${s*.84} ${s*.1},${s*.75} Z`} fill={fill} clipPath={`url(#${c})`}/>;
 
   const shields = {
-    // ── LA LIGA ──────────────────────────────────────────────────────────────
+    // - LA LIGA -
     "Deportivo Alavés": <D><Base fill="#1a3a6b"/><Half fill="#fff"/><T text="ALA" fill="#1a3a6b"/></D>,
     "Athletic Club":    <D><Base fill="#c8102e"/><VStripe fill="#fff" x1={0.27} w={0.2}/><VStripe fill="#fff" x1={0.6} w={0.2}/><T text="ATH"/></D>,
     "Atlético de Madrid":<D><Base fill="#c8102e"/><HStripe fill="#fff" y1={0.5} h={0.06}/><rect x="0" y={s*.56} width={s} height={s*.44} fill="#002d62" clipPath={`url(#${c})`}/><T text="ATM" y={0.35}/></D>,
@@ -81,7 +81,7 @@ function Shield({ team, size = 32 }) {
     "Valencia CF":      <D><Base fill="#1a1a1a"/><Half fill="#f5a623"/><T text="VAL"/></D>,
     "Villarreal CF":    <D><Base fill="#f5c500"/><TopBar fill="#1a1a1a" h={0.1}/><BotCap fill="#1a1a1a"/><T text="VIL" fill="#1a1a1a" y={0.5}/></D>,
 
-    // ── MUNDIAL ───────────────────────────────────────────────────────────────
+    // - MUNDIAL -
     "Alemania":         <D><Base fill="#000"/><HStripe fill="#dd0000" y1={0.37} h={0.26}/><HStripe fill="#ffce00" y1={0.63} h={0.37}/><T text="ALE"/></D>,
     "Arabia Saudí":     <D><Base fill="#006C35"/><HStripe fill="#fff" y1={0.62} h={0.38}/><T text="KSA"/></D>,
     "Argelia":          <D><Base fill="#006233"/><Half fill="#fff"/><T text="ALG" fill="#006233"/></D>,
@@ -150,7 +150,7 @@ function Shield({ team, size = 32 }) {
 }
 
 
-// ─── LOGOS ────────────────────────────────────────────────────────────────────
+// - LOGOS -
 function CromaLogo({ height = 48, color = "#ffffff" }) {
   return (
     <svg height={height} viewBox="0 0 581 664" style={{flexShrink:0}}>
@@ -159,7 +159,7 @@ function CromaLogo({ height = 48, color = "#ffffff" }) {
   );
 }
 
-// ─── ICONS ────────────────────────────────────────────────────────────────────
+// - ICONS -
 function LaLigaIcon({ size = 46 }) {
   const s = size;
   const body    = `M${s*.32},${s*.68} L${s*.68},${s*.68} L${s*.63},${s*.5} Q${s*.72},${s*.36} ${s*.7},${s*.2} Q${s*.5},${s*.14} ${s*.3},${s*.2} Q${s*.28},${s*.36} ${s*.37},${s*.5} Z`;
@@ -226,14 +226,14 @@ function ProgressRing({ pct, size=60, stroke=4, color="#f97316" }) {
   );
 }
 
-// ─── COLLECTIONS ─────────────────────────────────────────────────────────────
+// - COLLECTIONS -
 const COLLECTIONS = {
   laliga:  { id:"laliga",  name:"La Liga 2025-26", color:"#f97316", sub:"Trading Cards", cards: LALIGA_CARDS,  pricePerPack: 1.0, cardsPerPack: 6 },
   mundial: { id:"mundial", name:"Mundial 2026",     color:"#4ade80", sub:"Trading Cards", cards: MUNDIAL_CARDS, pricePerPack: 1.0, cardsPerPack: 6 },
 };
 
 
-// ─── CONTINENT GROUPS ────────────────────────────────────────────────────────
+// - CONTINENT GROUPS -
 const SELECCIONES_BY_CONTINENT = {
   "Europa": ["Alemania","Austria","Bélgica","Croacia","Escocia","España","Francia","Inglaterra","Irán","Japón","Noruega","Países Bajos","Portugal","Suiza","Túnez"],
   "América": ["Argentina","Brasil","Canadá","Colombia","Ecuador","Estados Unidos","Haití","México","Nueva Zelanda","Panamá","Paraguay","Uruguay"],
@@ -254,7 +254,7 @@ const SECTIONS_BY_COLL = {
   mundial: ["Todas","Selecciones","Golden Baller","Categorías Especiales","Especiales Únicas","Edición Limitada"],
 };
 
-// ─── STORAGE ─────────────────────────────────────────────────────────────────
+// - STORAGE -
 const LS = {
   loadOwned:  id => { try { const d=JSON.parse(localStorage.getItem(`cc_${id}`)||"{}"); return d.owned||d; } catch { return {}; } },
   loadRepeats:id => { try { const d=JSON.parse(localStorage.getItem(`cc_${id}`)||"{}"); return d.repeats||{}; } catch { return {}; } },
@@ -265,7 +265,7 @@ const LS = {
   savShowCost:v => { try { localStorage.setItem('croma_showcost',v?'true':'false'); } catch {} },
 };
 
-// ─── ACHIEVEMENTS ─────────────────────────────────────────────────────────────
+// - ACHIEVEMENTS -
 const ACHIEVEMENTS = {
   laliga: [
     { id:"l25", label:"25% completado", icon:"🥉", desc:"La Liga al 25%", threshold:25 },
@@ -286,12 +286,12 @@ function getPct(cards, ownedMap) {
   return Math.round(count/cards.length*100);
 }
 
-// ─── SECTION LABEL ────────────────────────────────────────────────────────────
+// - SECTION LABEL -
 function SectionLabel({ children, T }) {
   return <div style={{fontSize:13,letterSpacing:2,color:T.textDim,textTransform:"uppercase",marginBottom:12,fontWeight:700}}>{children}</div>;
 }
 
-// ─── TEAMS SECTION ───────────────────────────────────────────────────────────
+// - TEAMS SECTION -
 function TeamsSection({ allOwned, onTeamClick, T }) {
   const [expanded, setExpanded] = useState(null); // 'selecciones' | 'equipos'
   const [expandedContinent, setExpandedContinent] = useState(null);
@@ -398,7 +398,7 @@ function TeamsSection({ allOwned, onTeamClick, T }) {
   );
 }
 
-// ─── CROMA MASTER SECTION ────────────────────────────────────────────────────
+// - CROMA MASTER SECTION -
 function CromaMasterSection({ T }) {
   const cards = [
     {
@@ -411,7 +411,7 @@ function CromaMasterSection({ T }) {
       glow: "#4c6ef5",
       particle: "#818cf8",
       bg: "linear-gradient(160deg, #e8eaf6 0%, #c5cae9 40%, #e3e8ff 100%)",
-      icon: "◉",
+      icon: "-",
     },
     {
       id: "purple",
@@ -540,7 +540,7 @@ function CromaMasterSection({ T }) {
   );
 }
 
-// ─── HOME ─────────────────────────────────────────────────────────────────────
+// - HOME -
 function HomeScreen({ allOwned, allRepeats, onEnter, onNav, T, theme, toggleTheme, showCost, toggleCost }) {
   const laligaCards = COLLECTIONS.laliga.cards;
   const mundialCards = COLLECTIONS.mundial.cards;
@@ -756,7 +756,7 @@ function HomeScreen({ allOwned, allRepeats, onEnter, onNav, T, theme, toggleThem
   );
 }
 
-// ─── ACHIEVEMENTS SCREEN ──────────────────────────────────────────────────────
+// - ACHIEVEMENTS SCREEN -
 function AchievementsScreen({ allOwned, onBack, T }) {
   const laligaPct = getPct(COLLECTIONS.laliga.cards, allOwned.laliga||{});
   const mundialPct = getPct(COLLECTIONS.mundial.cards, allOwned.mundial||{});
@@ -802,7 +802,7 @@ function AchievementsScreen({ allOwned, onBack, T }) {
   );
 }
 
-// ─── REPEATS SCREEN ───────────────────────────────────────────────────────────
+// - REPEATS SCREEN -
 function RepeatsScreen({ allOwned, allRepeats, onBack, T }) {
   const [activeCollId, setActiveCollId] = useState("laliga");
   const coll = COLLECTIONS[activeCollId];
@@ -878,7 +878,7 @@ function RepeatsScreen({ allOwned, allRepeats, onBack, T }) {
   );
 }
 
-// ─── TEAM SCREEN ─────────────────────────────────────────────────────────────
+// - TEAM SCREEN -
 function PlayerCard({ card, owned, T, teamPrimary, teamSecondary }) {
   const positions = { "POR":"GK", "DEF":"DEF", "MED":"MID", "DEL":"FWD" };
   const pos = positions[card.pos] || card.section?.slice(0,3).toUpperCase() || "★";
@@ -1025,7 +1025,7 @@ function TeamScreen({ team, collId, ownedMap, onBack, T }) {
   );
 }
 
-// ─── STATS SCREEN ─────────────────────────────────────────────────────────────
+// - STATS SCREEN -
 function StatsScreen({ allOwned, onBack, T }) {
   const [activeTeam, setActiveTeam] = useState(null);
   const [activeCollId, setActiveCollId] = useState("laliga");
@@ -1051,7 +1051,7 @@ function StatsScreen({ allOwned, onBack, T }) {
 
   const renderRow = (item,i,arr,color) => {
     const handleTeamClick = () => setActiveTeam(item.team);
-    // Color gradient based on % — red < 40%, gold 40-79%, green 80%+
+    // Color gradient based on % - red < 40%, gold 40-79%, green 80%+
     const pctColor = item.pct===100 ? T.green : item.pct>=80 ? T.green : item.pct>=40 ? T.gold : T.red;
     const barGrad = item.pct===100
       ? T.green
@@ -1126,7 +1126,7 @@ function StatsScreen({ allOwned, onBack, T }) {
   );
 }
 
-// ─── PROFILE SCREEN ───────────────────────────────────────────────────────────
+// - PROFILE SCREEN -
 function ProfileScreen({ allOwned, onBack, T }) {
   const laligaPct = getPct(COLLECTIONS.laliga.cards, allOwned.laliga||{});
   const mundialPct = getPct(COLLECTIONS.mundial.cards, allOwned.mundial||{});
@@ -1195,7 +1195,7 @@ function ProfileScreen({ allOwned, onBack, T }) {
 }
 
 
-// ─── SECTION STYLES ──────────────────────────────────────────────────────────
+// - SECTION STYLES -
 const SECTION_STYLES = {
   // LA LIGA
   "Regulares":           { grad:["#1e2540","#0f1420"], accent:"#6b9bd2", label:"⚽" },
@@ -1244,7 +1244,7 @@ function getSectionStyle(section) {
   return SECTION_STYLES[section] || { grad:["#1a1a1a","#2a2a2a"], accent:"#6b7280", label:"🃏" };
 }
 
-// ─── COLLECTION GRID SCREEN ──────────────────────────────────────────────────
+// - COLLECTION GRID SCREEN -
 function CollectionGridScreen({ collId, ownedMap, repeatsMap, onSelectGroup, onBack, T }) {
   const cards = collId === 'laliga' ? LALIGA_CARDS : MUNDIAL_CARDS;
   const collName = collId === 'laliga' ? 'La Liga 2025-26' : 'Mundial 2026';
@@ -1426,7 +1426,7 @@ function CollectionGridScreen({ collId, ownedMap, repeatsMap, onSelectGroup, onB
   );
 }
 
-// ─── COLLECTION SCREEN ────────────────────────────────────────────────────────
+// - COLLECTION SCREEN -
 function CollectionScreen({ collId, ownedMap, repeatsMap, onToggle, onRepeat, onBack, T, filterGroup, filterSection }) {
   const coll = COLLECTIONS[collId];
   const [activeSection, setActiveSection] = useState("Todas");
@@ -1662,7 +1662,7 @@ function CollectionScreen({ collId, ownedMap, repeatsMap, onToggle, onRepeat, on
   );
 }
 
-// ─── NAV BAR ──────────────────────────────────────────────────────────────────
+// - NAV BAR -
 function NavBar({ screen, onNav, T }) {
   const items = [
     { id:"home",        label:"Inicio",    icon:"🏠" },
@@ -1685,7 +1685,7 @@ function NavBar({ screen, onNav, T }) {
   );
 }
 
-// ─── APP ROOT ─────────────────────────────────────────────────────────────────
+// - APP ROOT -
 export default function App() {
   const [screen, setScreen] = useState("home");
   const [activeCollId, setActiveCollId] = useState(null);
