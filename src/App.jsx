@@ -1288,9 +1288,10 @@ function CollectionGridScreen({ collId, ownedMap, repeatsMap, onSelectGroup, onB
   }, [cards, ownedMap, collId]);
 
   // Organize into sections
-  const sectionOrder = collId === 'laliga'
+  const sectionOrder = useMemo(() => collId === 'laliga'
     ? ['Regulares','Especiales','Actualización Plus','Coleccionables','Edición Limitada']
-    : ['Golden Baller','Selecciones','Contenders','Especiales','Coleccionables'];
+    : ['Golden Baller','Selecciones','Contenders','Especiales','Coleccionables'],
+  [collId]);
 
   const grouped = useMemo(() => {
     const s = {};
@@ -1300,7 +1301,7 @@ function CollectionGridScreen({ collId, ownedMap, repeatsMap, onSelectGroup, onB
       if (s[sec]) s[sec].push(g);
     });
     return s;
-  }, [groups]);
+  }, [groups, sectionOrder]);
 
   const totalOwned = Object.values(ownedMap).filter(Boolean).length +
     cards.filter(c => ownedMap[c.id] === undefined && c.owned).length;
